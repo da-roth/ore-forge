@@ -2,18 +2,12 @@
 #
 #  ORE-Forge CI Workflow
 #
-#  Comprehensive test matrix to find compatible combinations of:
-#  - ORE versions (v1.8.14.0, master)
-#  - QuantLib versions (OpenSourceRisk fork, lballabio master)
-#  - XAD-JIT + Forge integration
+#  Builds QuantLib (from ORE) with XAD-JIT + Forge integration.
 #
-#  Jobs:
-#  1. ore-pinned:           ORE v1.8.14.0 + OpenSourceRisk/QL v1.8.14.0 (baseline)
-#  2. ore-pinned-ql-master: ORE v1.8.14.0 + lballabio/QL master (compat test)
-#  3. ore-master-ql-master: ORE master + lballabio/QL master (compat test)
-#  4. qlrisks-ore-ql:       QuantLib-Risks-Cpp-Forge with ORE's QL version
-#  5. ore-forge-pinned:     ORE v1.8.14.0 + ORE's QL + XAD + Forge
-#  6. ore-forge-master:     ORE master + lballabio/QL master + XAD + Forge
+#  This requires patching ORE's QuantLib to fix constexpr incompatibility
+#  with XAD's non-literal Real type.
+#
+#  Based on QuantLib-Risks-Cpp-Forge CI workflow.
 #
 #  Copyright (C) 2025 The ORE-Forge Authors
 #
@@ -37,186 +31,20 @@ env:
 
 jobs:
   ##############################################################################
-  # 1. Baseline: ORE v1.8.14.0 with its pinned QuantLib
-  #    This MUST pass - establishes ORE builds correctly
+  # Build QuantLib (from ORE) with XAD-JIT + Forge
   ##############################################################################
-  ore-pinned:
+  quantlib-xad-forge:
     runs-on: ubuntu-latest
     container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "1. ORE v1.8.14.0 + ORE QL (baseline)"
+    name: "QuantLib (ORE) + XAD + Forge"
 
     steps:
+      # Get QuantLib from ORE Engine's submodule
       - name: Checkout ORE Engine
         uses: actions/checkout@v4
         with:
           repository: OpenSourceRisk/Engine
-          ref: v1.8.14.0
-          path: Engine
-          submodules: recursive
-
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.12
-        with:
-          key: ore-pinned
-          max-size: 1G
-
-      - name: Setup
-        run: apt-get update && apt-get install -y ninja-build ccache
-
-      - name: Configure ORE
-        run: |
-          cd Engine
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DORE_BUILD_DOC=OFF \
-            -DORE_BUILD_EXAMPLES=OFF \
-            -DORE_BUILD_TESTS=ON \
-            -DORE_BUILD_APP=ON \
-            -DORE_BUILD_SWIG=OFF
-
-      - name: Build ORE
-        run: cmake --build Engine/build --parallel
-
-      - name: Run QuantExt Tests
-        run: ./Engine/build/QuantExt/test/quantext-test-suite --log_level=message
-
-      - name: Run OREData Tests
-        run: ./Engine/build/OREData/test/ored-test-suite --log_level=message
-
-      - name: Run OREAnalytics Tests
-        run: ./Engine/build/OREAnalytics/test/orea-test-suite --log_level=message
-
-  ##############################################################################
-  # 2. Compatibility: ORE v1.8.14.0 with lballabio/QuantLib master
-  #    Tests if pinned ORE works with upstream QuantLib
-  ##############################################################################
-  ore-pinned-ql-master:
-    runs-on: ubuntu-latest
-    container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "2. ORE v1.8.14.0 + QL master"
-    continue-on-error: true
-
-    steps:
-      - name: Checkout ORE Engine (without submodules)
-        uses: actions/checkout@v4
-        with:
-          repository: OpenSourceRisk/Engine
-          ref: v1.8.14.0
-          path: Engine
-          submodules: false
-
-      - name: Checkout QuantLib master
-        uses: actions/checkout@v4
-        with:
-          repository: lballabio/QuantLib
-          ref: master
-          path: Engine/QuantLib
-
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.12
-        with:
-          key: ore-pinned-ql-master
-          max-size: 1G
-
-      - name: Setup
-        run: apt-get update && apt-get install -y ninja-build ccache
-
-      - name: Configure ORE
-        run: |
-          cd Engine
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DORE_BUILD_DOC=OFF \
-            -DORE_BUILD_EXAMPLES=OFF \
-            -DORE_BUILD_TESTS=ON \
-            -DORE_BUILD_APP=ON \
-            -DORE_BUILD_SWIG=OFF
-
-      - name: Build ORE
-        run: cmake --build Engine/build --parallel
-
-      - name: Run QuantExt Tests
-        run: ./Engine/build/QuantExt/test/quantext-test-suite --log_level=message
-
-  ##############################################################################
-  # 3. Compatibility: ORE master with lballabio/QuantLib master
-  #    Tests if latest ORE works with upstream QuantLib
-  ##############################################################################
-  ore-master-ql-master:
-    runs-on: ubuntu-latest
-    container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "3. ORE master + QL master"
-    continue-on-error: true
-
-    steps:
-      - name: Checkout ORE Engine (without submodules)
-        uses: actions/checkout@v4
-        with:
-          repository: OpenSourceRisk/Engine
-          ref: master
-          path: Engine
-          submodules: false
-
-      - name: Checkout QuantLib master
-        uses: actions/checkout@v4
-        with:
-          repository: lballabio/QuantLib
-          ref: master
-          path: Engine/QuantLib
-
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.12
-        with:
-          key: ore-master-ql-master
-          max-size: 1G
-
-      - name: Setup
-        run: apt-get update && apt-get install -y ninja-build ccache
-
-      - name: Configure ORE
-        run: |
-          cd Engine
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DORE_BUILD_DOC=OFF \
-            -DORE_BUILD_EXAMPLES=OFF \
-            -DORE_BUILD_TESTS=ON \
-            -DORE_BUILD_APP=ON \
-            -DORE_BUILD_SWIG=OFF
-
-      - name: Build ORE
-        run: cmake --build Engine/build --parallel
-
-      - name: Run QuantExt Tests
-        run: ./Engine/build/QuantExt/test/quantext-test-suite --log_level=message
-
-  ##############################################################################
-  # 4. XAD Test: QuantLib-Risks-Cpp-Forge with ORE's QuantLib version
-  #    Tests if XAD integration works with OpenSourceRisk/QuantLib
-  #    Gets QuantLib from ORE Engine submodule (no separate tag exists)
-  ##############################################################################
-  qlrisks-ore-ql:
-    runs-on: ubuntu-latest
-    container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "4. QL-Risks + ORE QL v1.8.14.0"
-    continue-on-error: true
-
-    steps:
-      # Get QuantLib from ORE Engine's submodule (QuantLib doesn't have v1.8.14.0 tag)
-      - name: Checkout ORE Engine (with QuantLib submodule only)
-        uses: actions/checkout@v4
-        with:
-          repository: OpenSourceRisk/Engine
-          ref: v1.8.14.0
+          ref: ${{ env.ore_version }}
           path: Engine
           submodules: false
 
@@ -249,10 +77,19 @@ jobs:
           ref: ${{ env.qlrisks_commit }}
           path: QuantLib-Risks-Cpp-Forge
 
+      - name: Patch QuantLib for XAD compatibility
+        run: |
+          # Fix constexpr Real incompatibility with XAD's non-literal type
+          # XAD's AReal<double> has a non-trivial destructor, so cannot be constexpr
+          cd QuantLib
+          sed -i 's/constexpr Real tolerance = 42 \* QL_EPSILON;/const Real tolerance = 42 * QL_EPSILON;/g' ql/math/comparison.hpp
+          echo "Patched ql/math/comparison.hpp:"
+          grep -n "tolerance = 42" ql/math/comparison.hpp
+
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.12
         with:
-          key: qlrisks-ore-ql
+          key: quantlib-xad-forge
           max-size: 1G
 
       - name: Setup
@@ -282,6 +119,7 @@ jobs:
             -DQL_NULL_AS_FUNCTIONS=ON \
             -DQL_BUILD_TEST_SUITE=OFF \
             -DQL_BUILD_EXAMPLES=OFF \
+            -DQL_BUILD_BENCHMARK=OFF \
             -DQLRISKS_DISABLE_AAD=OFF \
             -DQLRISKS_BUILD_TEST_SUITE=ON \
             -DQLRISKS_ENABLE_FORGE_TESTS=ON
@@ -291,249 +129,3 @@ jobs:
 
       - name: Run QuantLib-Risks Tests
         run: ./QuantLib/build/QuantLib-Risks-Cpp-Forge/test-suite/quantlib-risks-test-suite --log_level=message
-
-  ##############################################################################
-  # 5. Integration: ORE v1.8.14.0 + ORE's QuantLib + XAD + Forge
-  #    Main integration test with pinned versions
-  #    Gets QuantLib from ORE Engine submodule (no separate tag exists)
-  ##############################################################################
-  ore-forge-pinned:
-    runs-on: ubuntu-latest
-    container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "5. ORE v1.8.14.0 + XAD + Forge (pinned)"
-    needs: [ore-pinned, qlrisks-ore-ql]
-    if: |
-      always() &&
-      needs.ore-pinned.result == 'success'
-
-    steps:
-      # Checkout ORE first to get QuantLib from its submodule
-      - name: Checkout ORE Engine (without submodules)
-        uses: actions/checkout@v4
-        with:
-          repository: OpenSourceRisk/Engine
-          ref: v1.8.14.0
-          path: Engine
-          submodules: false
-
-      - name: Checkout QuantLib submodule
-        run: |
-          cd Engine
-          git submodule update --init QuantLib
-
-      - name: Move QuantLib to workspace root
-        run: mv Engine/QuantLib QuantLib
-
-      - name: Checkout XAD-JIT
-        uses: actions/checkout@v4
-        with:
-          repository: da-roth/xad-jit
-          ref: ${{ env.xad_commit }}
-          path: xad-jit
-
-      - name: Checkout Forge
-        uses: actions/checkout@v4
-        with:
-          repository: da-roth/forge
-          ref: ${{ env.forge_commit }}
-          path: forge
-
-      - name: Checkout QuantLib-Risks-Cpp-Forge
-        uses: actions/checkout@v4
-        with:
-          repository: da-roth/QuantLib-Risks-Cpp-Forge
-          ref: ${{ env.qlrisks_commit }}
-          path: QuantLib-Risks-Cpp-Forge
-
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.12
-        with:
-          key: ore-forge-pinned
-          max-size: 1G
-
-      - name: Setup
-        run: apt-get update && apt-get install -y ninja-build ccache
-
-      - name: Build Forge
-        run: |
-          cd forge
-          cmake -B build -S tools/packaging -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
-          cmake --build build
-          cmake --install build
-
-      - name: Configure QuantLib with XAD-JIT + Forge
-        run: |
-          cd QuantLib
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install \
-            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
-            -DXAD_WARNINGS_PARANOID=OFF \
-            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../QuantLib-Risks-Cpp-Forge" \
-            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
-            -DQL_NULL_AS_FUNCTIONS=ON \
-            -DQL_BUILD_TEST_SUITE=OFF \
-            -DQL_BUILD_EXAMPLES=OFF \
-            -DQLRISKS_DISABLE_AAD=OFF \
-            -DQLRISKS_BUILD_TEST_SUITE=OFF \
-            -DQLRISKS_ENABLE_FORGE_TESTS=OFF
-
-      - name: Build QuantLib
-        run: cmake --build QuantLib/build --parallel
-
-      - name: Install QuantLib
-        run: cmake --install QuantLib/build
-
-      - name: Configure ORE
-        run: |
-          cd Engine
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
-            -DORE_BUILD_DOC=OFF \
-            -DORE_BUILD_EXAMPLES=OFF \
-            -DORE_BUILD_TESTS=ON \
-            -DORE_BUILD_APP=ON \
-            -DORE_BUILD_SWIG=OFF
-
-      - name: Build ORE
-        run: cmake --build Engine/build --parallel
-
-      - name: Run QuantExt Tests
-        run: ./Engine/build/QuantExt/test/quantext-test-suite --log_level=message || true
-
-      - name: Run OREData Tests
-        run: ./Engine/build/OREData/test/ored-test-suite --log_level=message || true
-
-      - name: Run OREAnalytics Tests
-        run: ./Engine/build/OREAnalytics/test/orea-test-suite --log_level=message || true
-
-  ##############################################################################
-  # 6. Integration: ORE master + lballabio/QL master + XAD + Forge
-  #    Tests if latest versions all work together
-  ##############################################################################
-  ore-forge-master:
-    runs-on: ubuntu-latest
-    container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "6. ORE master + QL master + XAD + Forge"
-    needs: ore-master-ql-master
-    continue-on-error: true
-    if: |
-      always() &&
-      needs.ore-master-ql-master.result == 'success'
-
-    steps:
-      - name: Checkout QuantLib master
-        uses: actions/checkout@v4
-        with:
-          repository: lballabio/QuantLib
-          ref: master
-          path: QuantLib
-
-      - name: Checkout XAD-JIT
-        uses: actions/checkout@v4
-        with:
-          repository: da-roth/xad-jit
-          ref: ${{ env.xad_commit }}
-          path: xad-jit
-
-      - name: Checkout Forge
-        uses: actions/checkout@v4
-        with:
-          repository: da-roth/forge
-          ref: ${{ env.forge_commit }}
-          path: forge
-
-      - name: Checkout QuantLib-Risks-Cpp-Forge
-        uses: actions/checkout@v4
-        with:
-          repository: da-roth/QuantLib-Risks-Cpp-Forge
-          ref: ${{ env.qlrisks_commit }}
-          path: QuantLib-Risks-Cpp-Forge
-
-      - name: Checkout ORE Engine (without submodules)
-        uses: actions/checkout@v4
-        with:
-          repository: OpenSourceRisk/Engine
-          ref: master
-          path: Engine
-          submodules: false
-
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.12
-        with:
-          key: ore-forge-master
-          max-size: 1G
-
-      - name: Setup
-        run: apt-get update && apt-get install -y ninja-build ccache
-
-      - name: Build Forge
-        run: |
-          cd forge
-          cmake -B build -S tools/packaging -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
-          cmake --build build
-          cmake --install build
-
-      - name: Configure QuantLib with XAD-JIT + Forge
-        run: |
-          cd QuantLib
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install \
-            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
-            -DXAD_WARNINGS_PARANOID=OFF \
-            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../QuantLib-Risks-Cpp-Forge" \
-            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
-            -DQL_NULL_AS_FUNCTIONS=ON \
-            -DQL_BUILD_TEST_SUITE=OFF \
-            -DQL_BUILD_EXAMPLES=OFF \
-            -DQLRISKS_DISABLE_AAD=OFF \
-            -DQLRISKS_BUILD_TEST_SUITE=OFF \
-            -DQLRISKS_ENABLE_FORGE_TESTS=OFF
-
-      - name: Build QuantLib
-        run: cmake --build QuantLib/build --parallel
-
-      - name: Install QuantLib
-        run: cmake --install QuantLib/build
-
-      - name: Configure ORE
-        run: |
-          cd Engine
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
-            -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
-            -DORE_BUILD_DOC=OFF \
-            -DORE_BUILD_EXAMPLES=OFF \
-            -DORE_BUILD_TESTS=ON \
-            -DORE_BUILD_APP=ON \
-            -DORE_BUILD_SWIG=OFF
-
-      - name: Build ORE
-        run: cmake --build Engine/build --parallel
-
-      - name: Run QuantExt Tests
-        run: ./Engine/build/QuantExt/test/quantext-test-suite --log_level=message || true
-
-      - name: Run OREData Tests
-        run: ./Engine/build/OREData/test/ored-test-suite --log_level=message || true
-
-      - name: Run OREAnalytics Tests
-        run: ./Engine/build/OREAnalytics/test/orea-test-suite --log_level=message || true
