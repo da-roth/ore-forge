@@ -205,7 +205,8 @@ jobs:
 
   ##############################################################################
   # ORE + XAD-JIT + Forge integration
-  # The main integration build - compares against ore-original-pinned
+  # Uses lballabio/QuantLib (same as QuantLib-Risks-Cpp-Forge CI) to ensure
+  # XAD integration works with a known-good QuantLib version
   ##############################################################################
   ore-forge:
     runs-on: ubuntu-latest
@@ -213,13 +214,20 @@ jobs:
     name: ORE + XAD-JIT + Forge
 
     steps:
-      - name: Checkout ORE Engine
+      - name: Checkout ORE Engine (without QuantLib submodule)
         uses: actions/checkout@v4
         with:
           repository: ${{ env.ore_repo }}
           ref: ${{ env.ore_branch }}
           path: Engine
-          submodules: recursive
+          submodules: false
+
+      - name: Checkout QuantLib (lballabio/QuantLib - same as QuantLib-Risks-Cpp-Forge)
+        uses: actions/checkout@v4
+        with:
+          repository: lballabio/QuantLib
+          ref: master
+          path: Engine/QuantLib
 
       - name: Checkout XAD-JIT
         uses: actions/checkout@v4
