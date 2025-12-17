@@ -202,6 +202,7 @@ jobs:
   ##############################################################################
   # 4. XAD Test: QuantLib-Risks-Cpp-Forge with ORE's QuantLib version
   #    Tests if XAD integration works with OpenSourceRisk/QuantLib
+  #    Gets QuantLib from ORE Engine submodule (no separate tag exists)
   ##############################################################################
   qlrisks-ore-ql:
     runs-on: ubuntu-latest
@@ -210,12 +211,22 @@ jobs:
     continue-on-error: true
 
     steps:
-      - name: Checkout QuantLib (OpenSourceRisk fork)
+      # Get QuantLib from ORE Engine's submodule (QuantLib doesn't have v1.8.14.0 tag)
+      - name: Checkout ORE Engine (with QuantLib submodule only)
         uses: actions/checkout@v4
         with:
-          repository: OpenSourceRisk/QuantLib
+          repository: OpenSourceRisk/Engine
           ref: v1.8.14.0
-          path: QuantLib
+          path: Engine
+          submodules: false
+
+      - name: Checkout QuantLib submodule
+        run: |
+          cd Engine
+          git submodule update --init QuantLib
+
+      - name: Move QuantLib to workspace root
+        run: mv Engine/QuantLib QuantLib
 
       - name: Checkout XAD-JIT
         uses: actions/checkout@v4
@@ -284,6 +295,7 @@ jobs:
   ##############################################################################
   # 5. Integration: ORE v1.8.14.0 + ORE's QuantLib + XAD + Forge
   #    Main integration test with pinned versions
+  #    Gets QuantLib from ORE Engine submodule (no separate tag exists)
   ##############################################################################
   ore-forge-pinned:
     runs-on: ubuntu-latest
@@ -295,12 +307,22 @@ jobs:
       needs.ore-pinned.result == 'success'
 
     steps:
-      - name: Checkout QuantLib (OpenSourceRisk fork)
+      # Checkout ORE first to get QuantLib from its submodule
+      - name: Checkout ORE Engine (without submodules)
         uses: actions/checkout@v4
         with:
-          repository: OpenSourceRisk/QuantLib
+          repository: OpenSourceRisk/Engine
           ref: v1.8.14.0
-          path: QuantLib
+          path: Engine
+          submodules: false
+
+      - name: Checkout QuantLib submodule
+        run: |
+          cd Engine
+          git submodule update --init QuantLib
+
+      - name: Move QuantLib to workspace root
+        run: mv Engine/QuantLib QuantLib
 
       - name: Checkout XAD-JIT
         uses: actions/checkout@v4
@@ -322,14 +344,6 @@ jobs:
           repository: da-roth/QuantLib-Risks-Cpp-Forge
           ref: ${{ env.qlrisks_commit }}
           path: QuantLib-Risks-Cpp-Forge
-
-      - name: Checkout ORE Engine (without submodules)
-        uses: actions/checkout@v4
-        with:
-          repository: OpenSourceRisk/Engine
-          ref: v1.8.14.0
-          path: Engine
-          submodules: false
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.12
