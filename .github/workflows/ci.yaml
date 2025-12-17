@@ -211,7 +211,6 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/lballabio/quantlib-devenv:rolling
     name: ORE + XAD-JIT + Forge
-    needs: ore-original-pinned  # Only run if baseline passes
 
     steps:
       - name: Checkout ORE Engine
