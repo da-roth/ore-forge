@@ -2,12 +2,18 @@
 #
 #  ORE-Forge CI Workflow
 #
-#  Builds QuantLib (from ORE) with XAD-JIT + Forge integration.
+#  Builds QuantLib (from ORE) with XAD-JIT (Forge-enabled) and runs the
+#  QuantLib-Risks test suite including Forge JIT tests.
 #
-#  This requires patching ORE's QuantLib to fix constexpr incompatibility
-#  with XAD's non-literal Real type.
+#  This is a fork of QuantLib-Risks-Cpp-Forge adapted to use ORE's QuantLib
+#  fork with patches for XAD compatibility.
 #
-#  Based on QuantLib-Risks-Cpp-Forge CI workflow.
+#  This workflow:
+#  1. Gets QuantLib from ORE Engine's submodule
+#  2. Applies patches for XAD compatibility (constexpr -> const)
+#  3. Builds Forge as a pre-built package (isolates AVX2 flags)
+#  4. Configures QuantLib with XAD-JIT + ORE-Forge
+#  5. Runs the quantlib-risks-test-suite with Forge tests enabled
 #
 #  Copyright (C) 2025 The ORE-Forge Authors
 #
@@ -21,30 +27,59 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      ore_repo:
+        description: ORE Engine repository in <owner>/<repo> format
+        required: true
+        default: OpenSourceRisk/Engine
+      ore_branch:
+        description: Branch or tag for ORE Engine repository
+        required: true
+        default: v1.8.14.0
+      xad_repo:
+        description: XAD-JIT repository in <owner>/<repo> format
+        required: true
+        default: da-roth/xad-jit
+      xad_branch:
+        description: Branch or tag for XAD-JIT repository
+        required: true
+        default: main
+      forge_repo:
+        description: Forge repository in <owner>/<repo> format
+        required: true
+        default: da-roth/forge
+      forge_branch:
+        description: Branch or tag for Forge repository
+        required: true
+        default: main
 
 env:
-  # Pinned versions
-  ore_version: v1.8.14.0
-  xad_commit: ed10eeec8c0414e495f1b64f48c9b87aa2c1eecc
-  forge_commit: 8fead7cc0eade88448c052ebd3c579f858e1edfa
-  qlrisks_commit: 6c331dc034e25756f0d4263c0aa7a5035c177255
+  ore_repo: ${{ github.event.inputs.ore_repo || 'OpenSourceRisk/Engine' }}
+  ore_branch: ${{ github.event.inputs.ore_branch || 'v1.8.14.0' }}
+  xad_repo: ${{ github.event.inputs.xad_repo || 'da-roth/xad-jit' }}
+  xad_branch: ${{ github.event.inputs.xad_branch || 'main' }}
+  forge_repo: ${{ github.event.inputs.forge_repo || 'da-roth/forge' }}
+  forge_branch: ${{ github.event.inputs.forge_branch || 'main' }}
 
 jobs:
-  ##############################################################################
-  # Build QuantLib (from ORE) with XAD-JIT + Forge
-  ##############################################################################
-  quantlib-xad-forge:
+  linux-forge:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: ["Release", "Debug"]
+        capi: [off, on]
     runs-on: ubuntu-latest
     container: ghcr.io/lballabio/quantlib-devenv:rolling
-    name: "QuantLib (ORE) + XAD + Forge"
+
+    name: Linux ${{ matrix.build_type }} (${{ matrix.capi == 'on' && 'C API' || 'C++ API' }})
 
     steps:
-      # Get QuantLib from ORE Engine's submodule
+      # Get QuantLib from ORE Engine's submodule (instead of lballabio/QuantLib)
       - name: Checkout ORE Engine
         uses: actions/checkout@v4
         with:
-          repository: OpenSourceRisk/Engine
-          ref: ${{ env.ore_version }}
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
           path: Engine
           submodules: false
 
@@ -59,62 +94,82 @@ jobs:
       - name: Checkout XAD-JIT
         uses: actions/checkout@v4
         with:
-          repository: da-roth/xad-jit
-          ref: ${{ env.xad_commit }}
+          repository: ${{ env.xad_repo }}
+          ref: ${{ env.xad_branch }}
           path: xad-jit
 
       - name: Checkout Forge
         uses: actions/checkout@v4
         with:
-          repository: da-roth/forge
-          ref: ${{ env.forge_commit }}
+          repository: ${{ env.forge_repo }}
+          ref: ${{ env.forge_branch }}
           path: forge
 
-      - name: Checkout QuantLib-Risks-Cpp-Forge
+      # Checkout ORE-Forge (this repo - contains qlrisks.hpp, ForgeBackend, tests)
+      - name: Checkout ORE-Forge
         uses: actions/checkout@v4
         with:
-          repository: da-roth/QuantLib-Risks-Cpp-Forge
-          ref: ${{ env.qlrisks_commit }}
-          path: QuantLib-Risks-Cpp-Forge
+          path: ORE-Forge
 
-      - name: Patch QuantLib for XAD compatibility
+      # Apply patches for XAD compatibility
+      - name: Apply patches to QuantLib
         run: |
-          # Fix constexpr Real incompatibility with XAD's non-literal type
-          # XAD's AReal<double> has a non-trivial destructor, so cannot be constexpr
           cd QuantLib
-          sed -i 's/constexpr Real tolerance = 42 \* QL_EPSILON;/const Real tolerance = 42 * QL_EPSILON;/g' ql/math/comparison.hpp
-          echo "Patched ql/math/comparison.hpp:"
-          grep -n "tolerance = 42" ql/math/comparison.hpp
+          echo "Applying ORE-Forge patches..."
+          for patch in ../ORE-Forge/patches/*.patch; do
+            if [ -f "$patch" ]; then
+              echo "Applying: $patch"
+              git apply "$patch"
+            fi
+          done
+          echo "Patches applied. Verifying:"
+          grep -n "const Real tolerance" ql/math/comparison.hpp | head -2
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.12
         with:
-          key: quantlib-xad-forge
-          max-size: 1G
+          key: linux-forge-${{ matrix.build_type }}-${{ matrix.capi }}
+          max-size: 650M
 
       - name: Setup
-        run: apt-get update && apt-get install -y ninja-build ccache
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
 
-      - name: Build Forge
+      - name: Build Forge (C++ API)
+        if: matrix.capi == 'off'
         run: |
           cd forge
-          cmake -B build -S tools/packaging -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
+          cmake -B build -S tools/packaging \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
-          cmake --build build
-          cmake --install build
+          cmake --build build --config ${{ matrix.build_type }}
+          cmake --install build --config ${{ matrix.build_type }}
 
-      - name: Configure QuantLib with XAD-JIT + Forge
+      - name: Build Forge (C API)
+        if: matrix.capi == 'on'
+        run: |
+          cd forge
+          cmake -B build -S tools/capi \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
+          cmake --build build --config ${{ matrix.build_type }}
+          cmake --install build --config ${{ matrix.build_type }}
+
+      - name: Configure QuantLib with XAD-JIT + Forge (C++ API)
+        if: matrix.capi == 'off'
         run: |
           cd QuantLib
-          cmake -B build -G Ninja \
-            -DBOOST_ROOT=/usr \
+          mkdir build
+          cd build
+          cmake -G Ninja -DBOOST_ROOT=/usr \
             -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
             -DXAD_WARNINGS_PARANOID=OFF \
-            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../QuantLib-Risks-Cpp-Forge" \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../../install \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../../xad-jit;$(pwd)/../../ORE-Forge" \
             -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
             -DQL_NULL_AS_FUNCTIONS=ON \
             -DQL_BUILD_TEST_SUITE=OFF \
@@ -122,10 +177,39 @@ jobs:
             -DQL_BUILD_BENCHMARK=OFF \
             -DQLRISKS_DISABLE_AAD=OFF \
             -DQLRISKS_BUILD_TEST_SUITE=ON \
-            -DQLRISKS_ENABLE_FORGE_TESTS=ON
+            -DQLRISKS_ENABLE_FORGE_TESTS=ON \
+            ..
 
-      - name: Build QuantLib
-        run: cmake --build QuantLib/build --parallel
+      - name: Configure QuantLib with XAD-JIT + Forge (C API)
+        if: matrix.capi == 'on'
+        run: |
+          cd QuantLib
+          mkdir build
+          cd build
+          cmake -G Ninja -DBOOST_ROOT=/usr \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DXAD_WARNINGS_PARANOID=OFF \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../../install \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../../xad-jit;$(pwd)/../../ORE-Forge" \
+            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
+            -DQL_NULL_AS_FUNCTIONS=ON \
+            -DQL_BUILD_TEST_SUITE=OFF \
+            -DQL_BUILD_EXAMPLES=OFF \
+            -DQL_BUILD_BENCHMARK=OFF \
+            -DQLRISKS_DISABLE_AAD=OFF \
+            -DQLRISKS_USE_FORGE_CAPI=ON \
+            -DQLRISKS_BUILD_TEST_SUITE=ON \
+            -DQLRISKS_ENABLE_FORGE_TESTS=ON \
+            ..
 
-      - name: Run QuantLib-Risks Tests
-        run: ./QuantLib/build/QuantLib-Risks-Cpp-Forge/test-suite/quantlib-risks-test-suite --log_level=message
+      - name: Build
+        run: |
+          cd QuantLib/build
+          cmake --build .
+
+      - name: Test QuantLib-Risks
+        run: |
+          cd QuantLib/build
+          ./ORE-Forge/test-suite/quantlib-risks-test-suite --log_level=message

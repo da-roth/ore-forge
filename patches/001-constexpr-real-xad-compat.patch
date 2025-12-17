@@ -1,0 +1,20 @@
+--- a/ql/math/comparison.hpp
++++ b/ql/math/comparison.hpp
+@@ -66,7 +66,7 @@ namespace QuantLib {
+             return true;
+
+         Real diff = std::fabs(x-y);
+-        constexpr Real tolerance = 42 * QL_EPSILON;
++        const Real tolerance = 42 * QL_EPSILON;
+
+         if (x == 0.0 || y == 0.0)
+             return diff < (tolerance * tolerance);
+@@ -97,7 +97,7 @@ namespace QuantLib {
+             return true;
+
+         Real diff = std::fabs(x-y);
+-        constexpr Real tolerance = 42 * QL_EPSILON;
++        const Real tolerance = 42 * QL_EPSILON;
+
+         if (x == 0.0 || y == 0.0) // x or y = 0.0
+             return diff < (tolerance * tolerance);
