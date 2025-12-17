@@ -71,12 +71,14 @@ The CI workflow (`ci.yaml`) builds ORE with all components:
 
 ## Repository References
 
-| Repository | Purpose |
-|------------|---------|
-| [OpenSourceRisk/Engine](https://github.com/OpenSourceRisk/Engine) | ORE source code |
-| [da-roth/xad-jit](https://github.com/da-roth/xad-jit) | XAD with JIT compilation |
-| [da-roth/forge](https://github.com/da-roth/forge) | JIT compiler for math graphs |
-| [da-roth/QuantLib-Risks-Cpp-Forge](https://github.com/da-roth/QuantLib-Risks-Cpp-Forge) | QuantLib + XAD + Forge integration |
+| Repository | Purpose | Pinned Version |
+|------------|---------|----------------|
+| [OpenSourceRisk/Engine](https://github.com/OpenSourceRisk/Engine) | ORE source code | `v1.8.14.0` |
+| [da-roth/xad-jit](https://github.com/da-roth/xad-jit) | XAD with JIT compilation | `ed10eeec8c0414e495f1b64f48c9b87aa2c1eecc` |
+| [da-roth/forge](https://github.com/da-roth/forge) | JIT compiler for math graphs | `8fead7cc0eade88448c052ebd3c579f858e1edfa` |
+| [da-roth/QuantLib-Risks-Cpp-Forge](https://github.com/da-roth/QuantLib-Risks-Cpp-Forge) | QuantLib + XAD + Forge integration | `6c331dc034e25756f0d4263c0aa7a5035c177255` |
+
+> **Note:** Versions are pinned to ensure reproducible builds. The CI workflow can be manually triggered with different versions via `workflow_dispatch`.
 
 ## Manual Build
 

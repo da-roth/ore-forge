@@ -5,11 +5,10 @@
 #  Builds ORE (Open Source Risk Engine) with XAD-JIT and Forge integration
 #  for accelerated pricing and AAD-based sensitivities.
 #
-#  This workflow:
-#  1. Builds Forge as a pre-built package (isolates AVX2 flags)
-#  2. Configures ORE with its QuantLib submodule + XAD-JIT + QuantLib-Risks-Cpp-Forge
-#  3. Builds ORE (QuantExt, OREData, OREAnalytics)
-#  4. Runs tests
+#  Jobs:
+#  1. ore-original-pinned: Baseline ORE build with pinned QuantLib (v1.8.14.0)
+#  2. ore-original-ql-master: ORE build with QuantLib master (compatibility test)
+#  3. ore-forge: ORE with XAD-JIT + Forge integration
 #
 #  Copyright (C) 2025 The ORE-Forge Authors
 #
@@ -29,55 +28,190 @@ on:
         required: true
         default: OpenSourceRisk/Engine
       ore_branch:
-        description: Branch or tag for ORE Engine repository
+        description: Branch, tag, or commit for ORE Engine repository
         required: true
-        default: master
+        default: v1.8.14.0
       xad_repo:
         description: XAD-JIT repository in <owner>/<repo> format
         required: true
         default: da-roth/xad-jit
       xad_branch:
-        description: Branch or tag for XAD-JIT repository
+        description: Branch, tag, or commit for XAD-JIT repository
         required: true
-        default: main
+        default: ed10eeec8c0414e495f1b64f48c9b87aa2c1eecc
       forge_repo:
         description: Forge repository in <owner>/<repo> format
         required: true
         default: da-roth/forge
       forge_branch:
-        description: Branch or tag for Forge repository
+        description: Branch, tag, or commit for Forge repository
         required: true
-        default: main
+        default: 8fead7cc0eade88448c052ebd3c579f858e1edfa
       qlrisks_repo:
         description: QuantLib-Risks-Cpp-Forge repository in <owner>/<repo> format
         required: true
         default: da-roth/QuantLib-Risks-Cpp-Forge
       qlrisks_branch:
-        description: Branch or tag for QuantLib-Risks-Cpp-Forge repository
+        description: Branch, tag, or commit for QuantLib-Risks-Cpp-Forge repository
         required: true
-        default: main
+        default: 6c331dc034e25756f0d4263c0aa7a5035c177255
 
 env:
+  # ORE v1.8.14.0 - stable release with pinned QuantLib submodule
   ore_repo: ${{ github.event.inputs.ore_repo || 'OpenSourceRisk/Engine' }}
-  ore_branch: ${{ github.event.inputs.ore_branch || 'master' }}
+  ore_branch: ${{ github.event.inputs.ore_branch || 'v1.8.14.0' }}
+  # XAD-JIT - pinned commit (no tags available)
   xad_repo: ${{ github.event.inputs.xad_repo || 'da-roth/xad-jit' }}
-  xad_branch: ${{ github.event.inputs.xad_branch || 'main' }}
+  xad_branch: ${{ github.event.inputs.xad_branch || 'ed10eeec8c0414e495f1b64f48c9b87aa2c1eecc' }}
+  # Forge - pinned commit (no tags available)
   forge_repo: ${{ github.event.inputs.forge_repo || 'da-roth/forge' }}
-  forge_branch: ${{ github.event.inputs.forge_branch || 'main' }}
+  forge_branch: ${{ github.event.inputs.forge_branch || '8fead7cc0eade88448c052ebd3c579f858e1edfa' }}
+  # QuantLib-Risks-Cpp-Forge - pinned commit
   qlrisks_repo: ${{ github.event.inputs.qlrisks_repo || 'da-roth/QuantLib-Risks-Cpp-Forge' }}
-  qlrisks_branch: ${{ github.event.inputs.qlrisks_branch || 'main' }}
+  qlrisks_branch: ${{ github.event.inputs.qlrisks_branch || '6c331dc034e25756f0d4263c0aa7a5035c177255' }}
 
 jobs:
-  linux-build:
-    strategy:
-      fail-fast: false
-      matrix:
-        build_type: ["Release"]
-        capi: [off]
+  ##############################################################################
+  # Baseline: ORE with pinned QuantLib (v1.8.14.0)
+  # This should always pass - establishes that ORE itself builds correctly
+  ##############################################################################
+  ore-original-pinned:
     runs-on: ubuntu-latest
     container: ghcr.io/lballabio/quantlib-devenv:rolling
+    name: ORE Original (Pinned QL v1.8.14.0)
 
-    name: Linux ${{ matrix.build_type }} (${{ matrix.capi == 'on' && 'C API' || 'C++ API' }})
+    steps:
+      - name: Checkout ORE Engine
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: recursive
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: linux-ore-original-pinned
+          max-size: 1G
+
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
+
+      - name: Configure ORE
+        run: |
+          cd Engine
+          cmake -B build -G Ninja \
+            -DBOOST_ROOT=/usr \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DORE_BUILD_DOC=OFF \
+            -DORE_BUILD_EXAMPLES=OFF \
+            -DORE_BUILD_TESTS=ON \
+            -DORE_BUILD_APP=ON \
+            -DORE_BUILD_SWIG=OFF
+
+      - name: Build ORE
+        run: |
+          cd Engine/build
+          cmake --build . --parallel
+
+      - name: Run QuantExt Tests
+        run: |
+          cd Engine/build
+          ./QuantExt/test/quantext-test-suite --log_level=message
+
+      - name: Run OREData Tests
+        run: |
+          cd Engine/build
+          ./OREData/test/ored-test-suite --log_level=message
+
+      - name: Run OREAnalytics Tests
+        run: |
+          cd Engine/build
+          ./OREAnalytics/test/orea-test-suite --log_level=message
+
+  ##############################################################################
+  # Compatibility test: ORE with QuantLib master
+  # Tests if ORE is compatible with latest QuantLib - may fail
+  ##############################################################################
+  ore-original-ql-master:
+    runs-on: ubuntu-latest
+    container: ghcr.io/lballabio/quantlib-devenv:rolling
+    name: ORE Original (QL master)
+    continue-on-error: true  # This job may fail - it's informational
+
+    steps:
+      - name: Checkout ORE Engine (without submodules)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: false
+
+      - name: Checkout QuantLib master
+        uses: actions/checkout@v4
+        with:
+          repository: lballabio/QuantLib
+          ref: master
+          path: Engine/QuantLib
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: linux-ore-original-ql-master
+          max-size: 1G
+
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
+
+      - name: Configure ORE
+        run: |
+          cd Engine
+          cmake -B build -G Ninja \
+            -DBOOST_ROOT=/usr \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DORE_BUILD_DOC=OFF \
+            -DORE_BUILD_EXAMPLES=OFF \
+            -DORE_BUILD_TESTS=ON \
+            -DORE_BUILD_APP=ON \
+            -DORE_BUILD_SWIG=OFF
+
+      - name: Build ORE
+        run: |
+          cd Engine/build
+          cmake --build . --parallel
+
+      - name: Run QuantExt Tests
+        run: |
+          cd Engine/build
+          ./QuantExt/test/quantext-test-suite --log_level=message
+
+      - name: Run OREData Tests
+        run: |
+          cd Engine/build
+          ./OREData/test/ored-test-suite --log_level=message
+
+      - name: Run OREAnalytics Tests
+        run: |
+          cd Engine/build
+          ./OREAnalytics/test/orea-test-suite --log_level=message
+
+  ##############################################################################
+  # ORE + XAD-JIT + Forge integration
+  # The main integration build - compares against ore-original-pinned
+  ##############################################################################
+  ore-forge:
+    runs-on: ubuntu-latest
+    container: ghcr.io/lballabio/quantlib-devenv:rolling
+    name: ORE + XAD-JIT + Forge
+    needs: ore-original-pinned  # Only run if baseline passes
 
     steps:
       - name: Checkout ORE Engine
@@ -112,47 +246,34 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.12
         with:
-          key: linux-ore-forge-${{ matrix.build_type }}-${{ matrix.capi }}
+          key: linux-ore-forge
           max-size: 1G
 
       - name: Setup
         run: |
           apt-get update && apt-get install -y ninja-build ccache
 
-      - name: Build Forge (C++ API)
-        if: matrix.capi == 'off'
+      - name: Build Forge
         run: |
           cd forge
           cmake -B build -S tools/packaging \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
-          cmake --build build --config ${{ matrix.build_type }}
-          cmake --install build --config ${{ matrix.build_type }}
-
-      - name: Build Forge (C API)
-        if: matrix.capi == 'on'
-        run: |
-          cd forge
-          cmake -B build -S tools/capi \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
-          cmake --build build --config ${{ matrix.build_type }}
-          cmake --install build --config ${{ matrix.build_type }}
+          cmake --build build
+          cmake --install build
 
       - name: Configure ORE with XAD-JIT + Forge
         run: |
           cd Engine
-          mkdir build
-          cd build
-          cmake -G Ninja -DBOOST_ROOT=/usr \
+          cmake -B build -G Ninja \
+            -DBOOST_ROOT=/usr \
             -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DXAD_WARNINGS_PARANOID=OFF \
-            -DCMAKE_PREFIX_PATH=$(pwd)/../../install \
-            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../../xad-jit;$(pwd)/../../QuantLib-Risks-Cpp-Forge" \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../QuantLib-Risks-Cpp-Forge" \
             -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
             -DQL_NULL_AS_FUNCTIONS=ON \
             -DORE_BUILD_DOC=OFF \
@@ -162,9 +283,7 @@ jobs:
             -DORE_BUILD_SWIG=OFF \
             -DQLRISKS_DISABLE_AAD=OFF \
             -DQLRISKS_BUILD_TEST_SUITE=OFF \
-            -DQLRISKS_ENABLE_FORGE_TESTS=OFF \
-            ${{ matrix.capi == 'on' && '-DQLRISKS_USE_FORGE_CAPI=ON' || '' }} \
-            ..
+            -DQLRISKS_ENABLE_FORGE_TESTS=OFF
 
       - name: Build ORE
         run: |
