@@ -119,7 +119,7 @@ jobs:
           for patch in ../ORE-Forge/patches/*.patch; do
             if [ -f "$patch" ]; then
               echo "Applying: $patch"
-              git apply "$patch"
+              patch -p1 < "$patch"
             fi
           done
           echo "Patches applied. Verifying:"
