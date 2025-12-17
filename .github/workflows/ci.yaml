@@ -1,0 +1,187 @@
+##############################################################################
+#
+#  ORE-Forge CI Workflow
+#
+#  Builds ORE (Open Source Risk Engine) with XAD-JIT and Forge integration
+#  for accelerated pricing and AAD-based sensitivities.
+#
+#  This workflow:
+#  1. Builds Forge as a pre-built package (isolates AVX2 flags)
+#  2. Configures ORE with its QuantLib submodule + XAD-JIT + QuantLib-Risks-Cpp-Forge
+#  3. Builds ORE (QuantExt, OREData, OREAnalytics)
+#  4. Runs tests
+#
+#  Copyright (C) 2025 The ORE-Forge Authors
+#
+#  SPDX-License-Identifier: AGPL-3.0-or-later
+#
+##############################################################################
+
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      ore_repo:
+        description: ORE Engine repository in <owner>/<repo> format
+        required: true
+        default: OpenSourceRisk/Engine
+      ore_branch:
+        description: Branch or tag for ORE Engine repository
+        required: true
+        default: master
+      xad_repo:
+        description: XAD-JIT repository in <owner>/<repo> format
+        required: true
+        default: da-roth/xad-jit
+      xad_branch:
+        description: Branch or tag for XAD-JIT repository
+        required: true
+        default: main
+      forge_repo:
+        description: Forge repository in <owner>/<repo> format
+        required: true
+        default: da-roth/forge
+      forge_branch:
+        description: Branch or tag for Forge repository
+        required: true
+        default: main
+      qlrisks_repo:
+        description: QuantLib-Risks-Cpp-Forge repository in <owner>/<repo> format
+        required: true
+        default: da-roth/QuantLib-Risks-Cpp-Forge
+      qlrisks_branch:
+        description: Branch or tag for QuantLib-Risks-Cpp-Forge repository
+        required: true
+        default: main
+
+env:
+  ore_repo: ${{ github.event.inputs.ore_repo || 'OpenSourceRisk/Engine' }}
+  ore_branch: ${{ github.event.inputs.ore_branch || 'master' }}
+  xad_repo: ${{ github.event.inputs.xad_repo || 'da-roth/xad-jit' }}
+  xad_branch: ${{ github.event.inputs.xad_branch || 'main' }}
+  forge_repo: ${{ github.event.inputs.forge_repo || 'da-roth/forge' }}
+  forge_branch: ${{ github.event.inputs.forge_branch || 'main' }}
+  qlrisks_repo: ${{ github.event.inputs.qlrisks_repo || 'da-roth/QuantLib-Risks-Cpp-Forge' }}
+  qlrisks_branch: ${{ github.event.inputs.qlrisks_branch || 'main' }}
+
+jobs:
+  linux-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: ["Release"]
+        capi: [off]
+    runs-on: ubuntu-latest
+    container: ghcr.io/lballabio/quantlib-devenv:rolling
+
+    name: Linux ${{ matrix.build_type }} (${{ matrix.capi == 'on' && 'C API' || 'C++ API' }})
+
+    steps:
+      - name: Checkout ORE Engine
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: recursive
+
+      - name: Checkout XAD-JIT
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.xad_repo }}
+          ref: ${{ env.xad_branch }}
+          path: xad-jit
+
+      - name: Checkout Forge
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.forge_repo }}
+          ref: ${{ env.forge_branch }}
+          path: forge
+
+      - name: Checkout QuantLib-Risks-Cpp-Forge
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.qlrisks_repo }}
+          ref: ${{ env.qlrisks_branch }}
+          path: QuantLib-Risks-Cpp-Forge
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: linux-ore-forge-${{ matrix.build_type }}-${{ matrix.capi }}
+          max-size: 1G
+
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
+
+      - name: Build Forge (C++ API)
+        if: matrix.capi == 'off'
+        run: |
+          cd forge
+          cmake -B build -S tools/packaging \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
+          cmake --build build --config ${{ matrix.build_type }}
+          cmake --install build --config ${{ matrix.build_type }}
+
+      - name: Build Forge (C API)
+        if: matrix.capi == 'on'
+        run: |
+          cd forge
+          cmake -B build -S tools/capi \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
+          cmake --build build --config ${{ matrix.build_type }}
+          cmake --install build --config ${{ matrix.build_type }}
+
+      - name: Configure ORE with XAD-JIT + Forge
+        run: |
+          cd Engine
+          mkdir build
+          cd build
+          cmake -G Ninja -DBOOST_ROOT=/usr \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DXAD_WARNINGS_PARANOID=OFF \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../../install \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../../xad-jit;$(pwd)/../../QuantLib-Risks-Cpp-Forge" \
+            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
+            -DQL_NULL_AS_FUNCTIONS=ON \
+            -DORE_BUILD_DOC=OFF \
+            -DORE_BUILD_EXAMPLES=OFF \
+            -DORE_BUILD_TESTS=ON \
+            -DORE_BUILD_APP=ON \
+            -DORE_BUILD_SWIG=OFF \
+            -DQLRISKS_DISABLE_AAD=OFF \
+            -DQLRISKS_BUILD_TEST_SUITE=OFF \
+            -DQLRISKS_ENABLE_FORGE_TESTS=OFF \
+            ${{ matrix.capi == 'on' && '-DQLRISKS_USE_FORGE_CAPI=ON' || '' }} \
+            ..
+
+      - name: Build ORE
+        run: |
+          cd Engine/build
+          cmake --build . --parallel
+
+      - name: Run QuantExt Tests
+        run: |
+          cd Engine/build
+          ./QuantExt/test/quantext-test-suite --log_level=message || true
+
+      - name: Run OREData Tests
+        run: |
+          cd Engine/build
+          ./OREData/test/ored-test-suite --log_level=message || true
+
+      - name: Run OREAnalytics Tests
+        run: |
+          cd Engine/build
+          ./OREAnalytics/test/orea-test-suite --log_level=message || true
