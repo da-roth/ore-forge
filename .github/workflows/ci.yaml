@@ -205,8 +205,11 @@ jobs:
 
   ##############################################################################
   # ORE + XAD-JIT + Forge integration
-  # Uses lballabio/QuantLib (same as QuantLib-Risks-Cpp-Forge CI) to ensure
-  # XAD integration works with a known-good QuantLib version
+  #
+  # Build order:
+  # 1. Build Forge (pre-built package to isolate AVX2 flags)
+  # 2. Build QuantLib with XAD-JIT + Forge (same setup as QuantLib-Risks-Cpp-Forge CI)
+  # 3. Build ORE against the pre-built QuantLib
   ##############################################################################
   ore-forge:
     runs-on: ubuntu-latest
@@ -214,20 +217,13 @@ jobs:
     name: ORE + XAD-JIT + Forge
 
     steps:
-      - name: Checkout ORE Engine (without QuantLib submodule)
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.ore_repo }}
-          ref: ${{ env.ore_branch }}
-          path: Engine
-          submodules: false
-
+      # Checkout all dependencies first
       - name: Checkout QuantLib (lballabio/QuantLib - same as QuantLib-Risks-Cpp-Forge)
         uses: actions/checkout@v4
         with:
           repository: lballabio/QuantLib
           ref: master
-          path: Engine/QuantLib
+          path: QuantLib
 
       - name: Checkout XAD-JIT
         uses: actions/checkout@v4
@@ -250,6 +246,14 @@ jobs:
           ref: ${{ env.qlrisks_branch }}
           path: QuantLib-Risks-Cpp-Forge
 
+      - name: Checkout ORE Engine (without submodules)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: false
+
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.12
         with:
@@ -260,6 +264,7 @@ jobs:
         run: |
           apt-get update && apt-get install -y ninja-build ccache
 
+      # Step 1: Build Forge
       - name: Build Forge
         run: |
           cd forge
@@ -270,7 +275,40 @@ jobs:
           cmake --build build
           cmake --install build
 
-      - name: Configure ORE with XAD-JIT + Forge
+      # Step 2: Build QuantLib with XAD-JIT + Forge (same as QuantLib-Risks-Cpp-Forge CI)
+      - name: Configure QuantLib with XAD-JIT + Forge
+        run: |
+          cd QuantLib
+          cmake -B build -G Ninja \
+            -DBOOST_ROOT=/usr \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
+            -DXAD_WARNINGS_PARANOID=OFF \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../QuantLib-Risks-Cpp-Forge" \
+            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
+            -DQL_NULL_AS_FUNCTIONS=ON \
+            -DQL_BUILD_TEST_SUITE=OFF \
+            -DQL_BUILD_EXAMPLES=OFF \
+            -DQL_BUILD_BENCHMARK=OFF \
+            -DQLRISKS_DISABLE_AAD=OFF \
+            -DQLRISKS_BUILD_TEST_SUITE=OFF \
+            -DQLRISKS_ENABLE_FORGE_TESTS=OFF
+
+      - name: Build QuantLib
+        run: |
+          cd QuantLib/build
+          cmake --build . --parallel
+
+      - name: Install QuantLib
+        run: |
+          cd QuantLib/build
+          cmake --install .
+
+      # Step 3: Build ORE against pre-built QuantLib
+      - name: Configure ORE
         run: |
           cd Engine
           cmake -B build -G Ninja \
@@ -278,19 +316,12 @@ jobs:
             -DCMAKE_CXX_STANDARD=20 \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DXAD_WARNINGS_PARANOID=OFF \
             -DCMAKE_PREFIX_PATH=$(pwd)/../install \
-            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../QuantLib-Risks-Cpp-Forge" \
-            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
-            -DQL_NULL_AS_FUNCTIONS=ON \
             -DORE_BUILD_DOC=OFF \
             -DORE_BUILD_EXAMPLES=OFF \
             -DORE_BUILD_TESTS=ON \
             -DORE_BUILD_APP=ON \
-            -DORE_BUILD_SWIG=OFF \
-            -DQLRISKS_DISABLE_AAD=OFF \
-            -DQLRISKS_BUILD_TEST_SUITE=OFF \
-            -DQLRISKS_ENABLE_FORGE_TESTS=OFF
+            -DORE_BUILD_SWIG=OFF
 
       - name: Build ORE
         run: |
