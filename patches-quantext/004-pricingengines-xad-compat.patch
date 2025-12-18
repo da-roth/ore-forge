@@ -170,29 +170,3 @@ index 7111e6b..576a984 100644
  
      // bool stickyCloseOutRun = false;
      std::size_t regModelIndex = 0;
-diff --git a/qle/pricingengines/mclgmfwdbondengine.hpp b/qle/pricingengines/mclgmfwdbondengine.hpp
-index 0ff4962..e2a85a2 100644
---- a/qle/pricingengines/mclgmfwdbondengine.hpp
-+++ b/qle/pricingengines/mclgmfwdbondengine.hpp
-@@ -81,7 +81,7 @@ public:
- 
-     void calculate() const override;
-     void setMember() const;
--    double conversionFactor() const { return conversionFactor_->value(); } ;
-+    Real conversionFactor() const { return conversionFactor_->value(); } ;
- 
-     RandomVariable
-     overwritePathValueUndDirty(double t, const RandomVariable& pathValueUndDirty,
-diff --git a/qle/pricingengines/mcmultilegbaseengine.hpp b/qle/pricingengines/mcmultilegbaseengine.hpp
-index f6aa734..5fac2c3 100644
---- a/qle/pricingengines/mcmultilegbaseengine.hpp
-+++ b/qle/pricingengines/mcmultilegbaseengine.hpp
-@@ -151,7 +151,7 @@ public:
-     // results, these are read from derived engines
-     mutable Real resultUnderlyingNpv_, resultValue_;
- 
--    static constexpr Real tinyTime = 1E-10;
-+    static inline const Real tinyTime = 1E-10;
- 
-     // data structure storing info needed to generate the amount for a cashflow
-     struct CashflowInfo {
