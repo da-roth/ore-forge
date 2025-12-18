@@ -1,5 +1,5 @@
 diff --git a/ql/pricingengines/vanilla/analyticeuropeanengine.cpp b/ql/pricingengines/vanilla/analyticeuropeanengine.cpp
-index 62dee1b..adf0d17 100644
+index 62dee1b..43beb70 100644
 --- a/ql/pricingengines/vanilla/analyticeuropeanengine.cpp
 +++ b/ql/pricingengines/vanilla/analyticeuropeanengine.cpp
 @@ -89,7 +89,7 @@ namespace QuantLib {
@@ -7,7 +7,7 @@ index 62dee1b..adf0d17 100644
  
          auto [variance, volType, displacement] = convertInputVariance(
 -            modelType_, displacement_, *process_->blackVolatility(), forwardPrice, payoff->strike(),
-+            modelType_, xad::value(displacement_), *process_->blackVolatility(), forwardPrice, payoff->strike(),
++            modelType_, xad::value(displacement_), *process_->blackVolatility(), xad::value(forwardPrice), xad::value(payoff->strike()),
              process_->blackVolatility()->timeFromReference(arguments_.exercise->lastDate()));
          
          DiffusionCalculator black(payoff, forwardPrice, std::sqrt(variance), df, volType, displacement);

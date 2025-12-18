@@ -1,8 +1,8 @@
 diff --git a/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp b/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp
-index 7fbfca5..49d4eba 100644
+index 7fbfca5..56378c4 100644
 --- a/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp
 +++ b/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp
-@@ -30,14 +30,14 @@
+@@ -30,16 +30,16 @@
  namespace QuantLib {
  
  namespace {
@@ -17,10 +17,14 @@ index 7fbfca5..49d4eba 100644
      QL_REQUIRE(times[1] > times[0], "times must be sorted");
      QL_REQUIRE(variances[1] >= variances[0], "variances must be non-decreasing");
 -    std::array<double, 2> vols;
+-    vols[0] = close_enough(times[0], 0.0) ? 0.0 : std::sqrt(variances[0] / times[0]);
+-    vols[1] = close_enough(times[1], 0.0) ? 0.0 : std::sqrt(variances[1] / times[1]);
 +    std::array<Real, 2> vols;
-     vols[0] = close_enough(times[0], 0.0) ? 0.0 : std::sqrt(variances[0] / times[0]);
-     vols[1] = close_enough(times[1], 0.0) ? 0.0 : std::sqrt(variances[1] / times[1]);
++    vols[0] = close_enough(times[0], 0.0) ? Real(0.0) : std::sqrt(variances[0] / times[0]);
++    vols[1] = close_enough(times[1], 0.0) ? Real(0.0) : std::sqrt(variances[1] / times[1]);
      LinearInterpolation interpolation(times.begin(), times.end(), vols.begin());
+     return std::max(interpolation(t, true), 0.0);
+ }
 @@ -48,12 +48,12 @@ inline Real linearExtrapolation(const double t, const std::array<double, 2>& tim
  
  
