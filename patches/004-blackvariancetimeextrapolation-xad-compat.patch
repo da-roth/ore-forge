@@ -1,5 +1,5 @@
 diff --git a/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp b/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp
-index 7fbfca5..35cb817 100644
+index 7fbfca5..49d4eba 100644
 --- a/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp
 +++ b/ql/termstructures/volatility/equityfx/blackvariancetimeextrapolation.hpp
 @@ -30,14 +30,14 @@
@@ -21,3 +21,50 @@ index 7fbfca5..35cb817 100644
      vols[0] = close_enough(times[0], 0.0) ? 0.0 : std::sqrt(variances[0] / times[0]);
      vols[1] = close_enough(times[1], 0.0) ? 0.0 : std::sqrt(variances[1] / times[1]);
      LinearInterpolation interpolation(times.begin(), times.end(), vols.begin());
+@@ -48,12 +48,12 @@ inline Real linearExtrapolation(const double t, const std::array<double, 2>& tim
+ 
+ 
+ //! Extrapolate black variance using flat vol extrapolation in time direction
+-Real timeExtrapolatationBlackVarianceFlat(const Time t, const std::vector<double>& times,
++Real timeExtrapolatationBlackVarianceFlat(const Time t, const std::vector<Real>& times,
+     const Interpolation& varianceCurve);
+ 
+ //! Extrapolate black variance using flat vol extrapolation in time direction
+ template <typename F>
+-Real timeExtrapolatationBlackVarianceFlat(const Time t, const Real strike, const std::vector<double>& times,
++Real timeExtrapolatationBlackVarianceFlat(const Time t, const Real strike, const std::vector<Real>& times,
+                                           const F& varianceSurface) {
+     return std::max(varianceSurface(times.back(), strike, true), 0.0) / times.back() * t;
+ }
+@@ -62,14 +62,14 @@ Real timeExtrapolatationBlackVarianceFlat(const Time t, const Real strike, const
+ //! Extrapolate black variance in vol space and time direction using interpolation
+ //! Takes black variances convert them to volatilities and then linearly extrapolates
+ //! the volatilities in time direction
+-Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const std::vector<double>& times,
++Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const std::vector<Real>& times,
+     const Interpolation& varianceCurve);
+ 
+ //! Extrapolate black variance in vol space and time direction using interpolation
+ //! Takes black variances convert them to volatilities and then linearly extrapolates
+ //! the volatilities in time direction
+ template <typename F>
+-Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const Real strike, const std::vector<double>& times,
++Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const Real strike, const std::vector<Real>& times,
+                                                   const F& varianceSurface) {
+     Size ind1 = times.size() - 2;
+     Size ind2 = times.size() - 1;
+@@ -81,12 +81,12 @@ Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const Real strik
+     return v * v * t;
+ }
+ 
+-inline Real timeExtrapolatationBlackVarianceFlat(const Time t, const std::vector<double>& times,
++inline Real timeExtrapolatationBlackVarianceFlat(const Time t, const std::vector<Real>& times,
+                                                  const Interpolation& varianceCurve) {
+     return std::max(varianceCurve(times.back(), true), 0.0) / times.back() * t;
+ }
+ 
+-inline Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const std::vector<double>& times,
++inline Real timeExtrapolatationBlackVarianceInVolatility(const Time t, const std::vector<Real>& times,
+                                                          const Interpolation& varianceCurve) {
+     Size ind1 = times.size() - 2;
+     Size ind2 = times.size() - 1;
