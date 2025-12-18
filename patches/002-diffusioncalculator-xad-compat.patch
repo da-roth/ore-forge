@@ -1,5 +1,5 @@
 diff --git a/ql/pricingengines/diffusioncalculator.cpp b/ql/pricingengines/diffusioncalculator.cpp
-index df88638..919ca68 100644
+index df88638..f30fddd 100644
 --- a/ql/pricingengines/diffusioncalculator.cpp
 +++ b/ql/pricingengines/diffusioncalculator.cpp
 @@ -25,32 +25,32 @@
@@ -52,7 +52,7 @@ index df88638..919ca68 100644
 +            Real nVol =
                  convertShiftedLognormalToNormalVol(forward, strike, t, slnVol, inputDisplacement);
 -            return std::make_tuple(nVol, VolatilityType::Normal, targetDisplacement);
-+            return std::make_tuple(static_cast<double>(nVol), VolatilityType::Normal, targetDisplacement);
++            return std::make_tuple(xad::value(nVol), VolatilityType::Normal, targetDisplacement);
          }
  
          if (inputVolType == VolatilityType::Normal &&
@@ -62,7 +62,7 @@ index df88638..919ca68 100644
 +            Real slnVol =
                  convertNormalToShiftedLogNormalVol(forward, strike, t, nVol, targetDisplacement);
 -            return std::make_tuple(slnVol, VolatilityType::ShiftedLognormal, targetDisplacement);
-+            return std::make_tuple(static_cast<double>(slnVol), VolatilityType::ShiftedLognormal, targetDisplacement);
++            return std::make_tuple(xad::value(slnVol), VolatilityType::ShiftedLognormal, targetDisplacement);
          }
  
          if (inputVolType == VolatilityType::ShiftedLognormal &&
@@ -74,19 +74,16 @@ index df88638..919ca68 100644
 +            Real newSlnVol = convertShiftedLognormalToShiftedLognormalVol(
                  forward, strike, t, slnVol, inputDisplacement, targetDisplacement);
 -            return std::make_tuple(newSlnVol, VolatilityType::ShiftedLognormal,
-+            return std::make_tuple(static_cast<double>(newSlnVol), VolatilityType::ShiftedLognormal,
++            return std::make_tuple(xad::value(newSlnVol), VolatilityType::ShiftedLognormal,
                                     targetDisplacement);
          }
  
-@@ -114,8 +114,10 @@ namespace QuantLib {
-                                        double forward,
+@@ -115,7 +115,7 @@ namespace QuantLib {
                                         double strike,
                                         double t) {
-+        double shift = volTS->shift();
-+        double blackVol = volTS->blackVol(t, strike);
          return convertInputVolatility(outputModelType, displacement, volTS->volType(),
 -                                      volTS->shift(), volTS->blackVol(t, strike), forward, strike,
-+                                      shift, blackVol, forward, strike,
++                                      xad::value(volTS->shift()), xad::value(volTS->blackVol(t, strike)), forward, strike,
                                        t);
      }
  
