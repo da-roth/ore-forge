@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/blackswaptionenginedeltagamma.hpp b/QuantExt/qle/pricingengines/blackswaptionenginedeltagamma.hpp
+diff --git a/qle/pricingengines/blackswaptionenginedeltagamma.hpp b/qle/pricingengines/blackswaptionenginedeltagamma.hpp
 index a8a046b..c858c1c 100644
---- a/QuantExt/qle/pricingengines/blackswaptionenginedeltagamma.hpp
-+++ b/QuantExt/qle/pricingengines/blackswaptionenginedeltagamma.hpp
+--- a/qle/pricingengines/blackswaptionenginedeltagamma.hpp
++++ b/qle/pricingengines/blackswaptionenginedeltagamma.hpp
 @@ -457,11 +457,11 @@ template <class Spec> void BlackStyleSwaptionEngineDeltaGamma<Spec>::calculate()
              Matrix result(2 * n, 2 * n, 0.0);
              for (Size i = 0; i < 2 * n; ++i) {

@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp b/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp
+diff --git a/qle/pricingengines/mclgmfwdbondengine.cpp b/qle/pricingengines/mclgmfwdbondengine.cpp
 index 7111e6b..576a984 100644
---- a/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp
-+++ b/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp
+--- a/qle/pricingengines/mclgmfwdbondengine.cpp
++++ b/qle/pricingengines/mclgmfwdbondengine.cpp
 @@ -41,7 +41,7 @@ void McLgmFwdBondEngine::setMember() const {
      }
  
@@ -64,10 +64,10 @@ index 7111e6b..576a984 100644
  
      // bool stickyCloseOutRun = false;
      std::size_t regModelIndex = 0;
-diff --git a/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp b/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp
+diff --git a/qle/pricingengines/mclgmfwdbondengine.hpp b/qle/pricingengines/mclgmfwdbondengine.hpp
 index 0ff4962..e2a85a2 100644
---- a/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp
-+++ b/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp
+--- a/qle/pricingengines/mclgmfwdbondengine.hpp
++++ b/qle/pricingengines/mclgmfwdbondengine.hpp
 @@ -81,7 +81,7 @@ public:
  
      void calculate() const override;

@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/analyticlgmcdsoptionengine.cpp b/QuantExt/qle/pricingengines/analyticlgmcdsoptionengine.cpp
+diff --git a/qle/pricingengines/analyticlgmcdsoptionengine.cpp b/qle/pricingengines/analyticlgmcdsoptionengine.cpp
 index bcea0ee..0f23924 100644
---- a/QuantExt/qle/pricingengines/analyticlgmcdsoptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/analyticlgmcdsoptionengine.cpp
+--- a/qle/pricingengines/analyticlgmcdsoptionengine.cpp
++++ b/qle/pricingengines/analyticlgmcdsoptionengine.cpp
 @@ -73,11 +73,11 @@ void AnalyticLgmCdsOptionEngine::calculate() const {
          t_[i + 1] = yts->timeFromReference(cpn->date());
          Real mid = (t_[i] + t_[i + 1]) / 2.0;

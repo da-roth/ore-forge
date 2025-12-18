@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/commodityspreadoptionengine.cpp b/QuantExt/qle/pricingengines/commodityspreadoptionengine.cpp
+diff --git a/qle/pricingengines/commodityspreadoptionengine.cpp b/qle/pricingengines/commodityspreadoptionengine.cpp
 index 27feb3b..07c1ada 100644
---- a/QuantExt/qle/pricingengines/commodityspreadoptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/commodityspreadoptionengine.cpp
+--- a/qle/pricingengines/commodityspreadoptionengine.cpp
++++ b/qle/pricingengines/commodityspreadoptionengine.cpp
 @@ -71,7 +71,7 @@ void CommoditySpreadOptionAnalyticalEngine::calculate() const {
  
      QL_REQUIRE(paymentDate >= exerciseDate, "Payment date needs to be on or after exercise date");
@@ -79,10 +79,10 @@ index 27feb3b..07c1ada 100644
          res.atm = atmUnderlyingCurrency * fxSpot;
          res.sigma = 0;
          if (res.tn > 0 && !QuantLib::close_enough(res.tn, 0.0)) {
-diff --git a/QuantExt/qle/pricingengines/commodityspreadoptionengine.hpp b/QuantExt/qle/pricingengines/commodityspreadoptionengine.hpp
+diff --git a/qle/pricingengines/commodityspreadoptionengine.hpp b/qle/pricingengines/commodityspreadoptionengine.hpp
 index b068a5a..2927236 100644
---- a/QuantExt/qle/pricingengines/commodityspreadoptionengine.hpp
-+++ b/QuantExt/qle/pricingengines/commodityspreadoptionengine.hpp
+--- a/qle/pricingengines/commodityspreadoptionengine.hpp
++++ b/qle/pricingengines/commodityspreadoptionengine.hpp
 @@ -70,7 +70,7 @@ private:
                                                      const ext::shared_ptr<FxIndex>& fxIndex) const;
  

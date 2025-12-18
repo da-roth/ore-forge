@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/discountingbondtrsengine.cpp b/QuantExt/qle/pricingengines/discountingbondtrsengine.cpp
+diff --git a/qle/pricingengines/discountingbondtrsengine.cpp b/qle/pricingengines/discountingbondtrsengine.cpp
 index e43e2e9..ed18301 100644
---- a/QuantExt/qle/pricingengines/discountingbondtrsengine.cpp
-+++ b/QuantExt/qle/pricingengines/discountingbondtrsengine.cpp
+--- a/qle/pricingengines/discountingbondtrsengine.cpp
++++ b/qle/pricingengines/discountingbondtrsengine.cpp
 @@ -99,9 +99,9 @@ void DiscountingBondTRSEngine::calculate() const {
              Real S = 1.0;
  
@@ -41,10 +41,10 @@ index e43e2e9..ed18301 100644
              bondDefaultCurve->survivalProbability(bondFlowPayDate);
  
          // 5e set bond cashflow and additional results
-diff --git a/QuantExt/qle/pricingengines/discountingswapenginedeltagamma.cpp b/QuantExt/qle/pricingengines/discountingswapenginedeltagamma.cpp
+diff --git a/qle/pricingengines/discountingswapenginedeltagamma.cpp b/qle/pricingengines/discountingswapenginedeltagamma.cpp
 index f8ff0f7..0c3a998 100644
---- a/QuantExt/qle/pricingengines/discountingswapenginedeltagamma.cpp
-+++ b/QuantExt/qle/pricingengines/discountingswapenginedeltagamma.cpp
+--- a/qle/pricingengines/discountingswapenginedeltagamma.cpp
++++ b/qle/pricingengines/discountingswapenginedeltagamma.cpp
 @@ -289,19 +289,19 @@ Matrix rebucketGammas(const std::vector<Time>& gammaTimes, const std::map<Date,
              if (i1 >= 0) {
                  if (i2 < n - 1)
@@ -106,10 +106,10 @@ index f8ff0f7..0c3a998 100644
          }
      }
  
-diff --git a/QuantExt/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp b/QuantExt/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp
+diff --git a/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp b/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp
 index 8f31ce4..b77e70e 100644
---- a/QuantExt/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp
+--- a/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp
++++ b/qle/pricingengines/numericalintegrationindexcdsoptionengine.cpp
 @@ -61,7 +61,7 @@ void NumericalIntegrationIndexCdsOptionEngine::doCalc() const {
          results_.additionalResults["discountToExerciseSwapCurrency"] = discSwapCurrToExercise;
          results_.additionalResults["upfront"] =
@@ -119,10 +119,10 @@ index 8f31ce4..b77e70e 100644
          results_.additionalResults["valuationDateNotional"] = arguments_.swap->notional();
          results_.additionalResults["tradeDateNotional"] = arguments_.tradeDateNtl;
          results_.additionalResults["callPut"] =
-diff --git a/QuantExt/qle/pricingengines/numericlgmbgsflexiswapengine.cpp b/QuantExt/qle/pricingengines/numericlgmbgsflexiswapengine.cpp
+diff --git a/qle/pricingengines/numericlgmbgsflexiswapengine.cpp b/qle/pricingengines/numericlgmbgsflexiswapengine.cpp
 index 7320fd4..7db7530 100644
---- a/QuantExt/qle/pricingengines/numericlgmbgsflexiswapengine.cpp
-+++ b/QuantExt/qle/pricingengines/numericlgmbgsflexiswapengine.cpp
+--- a/qle/pricingengines/numericlgmbgsflexiswapengine.cpp
++++ b/qle/pricingengines/numericlgmbgsflexiswapengine.cpp
 @@ -67,7 +67,7 @@ void NumericLgmBgsFlexiSwapEngine::calculate() const {
          if (i > 0) {
              // ratio of zero-cpr notionals

@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/commodityapoengine.cpp b/QuantExt/qle/pricingengines/commodityapoengine.cpp
+diff --git a/qle/pricingengines/commodityapoengine.cpp b/qle/pricingengines/commodityapoengine.cpp
 index 79924d7..4a9ef1f 100644
---- a/QuantExt/qle/pricingengines/commodityapoengine.cpp
-+++ b/QuantExt/qle/pricingengines/commodityapoengine.cpp
+--- a/qle/pricingengines/commodityapoengine.cpp
++++ b/qle/pricingengines/commodityapoengine.cpp
 @@ -44,12 +44,12 @@ QuantLib::Real MomentMatchingResults::stdDev() { return std::sqrt(secondMoment()
  QuantLib::Time MomentMatchingResults::timeToExpiry() { return tn; }
  

@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/models/defaultableequityjumpdiffusionmodel.hpp b/QuantExt/qle/models/defaultableequityjumpdiffusionmodel.hpp
+diff --git a/qle/models/defaultableequityjumpdiffusionmodel.hpp b/qle/models/defaultableequityjumpdiffusionmodel.hpp
 index 47ec2dc..d89cd1d 100644
---- a/QuantExt/qle/models/defaultableequityjumpdiffusionmodel.hpp
-+++ b/QuantExt/qle/models/defaultableequityjumpdiffusionmodel.hpp
+--- a/qle/models/defaultableequityjumpdiffusionmodel.hpp
++++ b/qle/models/defaultableequityjumpdiffusionmodel.hpp
 @@ -186,7 +186,7 @@ private:
      mutable Real totalBlackVariance_ = 1.0;
  
@@ -11,10 +11,10 @@ index 47ec2dc..d89cd1d 100644
  };
  
  } // namespace QuantExt
-diff --git a/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp b/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp
+diff --git a/qle/pricingengines/mcmultilegbaseengine.hpp b/qle/pricingengines/mcmultilegbaseengine.hpp
 index f6aa734..5fac2c3 100644
---- a/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp
-+++ b/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp
+--- a/qle/pricingengines/mcmultilegbaseengine.hpp
++++ b/qle/pricingengines/mcmultilegbaseengine.hpp
 @@ -151,7 +151,7 @@ public:
      // results, these are read from derived engines
      mutable Real resultUnderlyingNpv_, resultValue_;

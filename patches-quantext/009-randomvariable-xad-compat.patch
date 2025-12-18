@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/math/randomvariable.hpp b/QuantExt/qle/math/randomvariable.hpp
+diff --git a/qle/math/randomvariable.hpp b/qle/math/randomvariable.hpp
 index 7582b14..8eb0133 100644
---- a/QuantExt/qle/math/randomvariable.hpp
-+++ b/QuantExt/qle/math/randomvariable.hpp
+--- a/qle/math/randomvariable.hpp
++++ b/qle/math/randomvariable.hpp
 @@ -362,7 +362,7 @@ inline void RandomVariable::set(const Size i, const Real v) {
              return;
          }

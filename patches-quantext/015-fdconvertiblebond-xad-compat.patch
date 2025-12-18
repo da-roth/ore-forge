@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp b/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp
+diff --git a/qle/pricingengines/fdconvertiblebondevents.cpp b/qle/pricingengines/fdconvertiblebondevents.cpp
 index 75f2d09..63518c3 100644
---- a/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp
-+++ b/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp
+--- a/qle/pricingengines/fdconvertiblebondevents.cpp
++++ b/qle/pricingengines/fdconvertiblebondevents.cpp
 @@ -230,7 +230,7 @@ void FdConvertibleBondEvents::processMakeWholeData() {
          for (Size i = 0; i < grid_.size(); ++i) {
              if (hasCall_[i]) {
@@ -29,10 +29,10 @@ index 75f2d09..63518c3 100644
                      } else {
                          Real f = std::max(S - H, 0.0) / std::max(S - D, 1E-4);
                          if (c.adjustmentStyle == ConvertibleBond2::DividendProtectionData::AdjustmentStyle::CrUpOnly2)
-diff --git a/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp b/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
+diff --git a/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp b/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
 index cd6dbd6..65a0d75 100644
---- a/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
-+++ b/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
+--- a/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
++++ b/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
 @@ -242,7 +242,7 @@ void FdDefaultableEquityJumpDiffusionConvertibleBondEngine::calculate() const {
          return notionals[std::max<Size>(std::distance(notionalTimes.begin(), cn), 1) - 1];
      };

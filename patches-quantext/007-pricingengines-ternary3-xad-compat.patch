@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp b/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp
+diff --git a/qle/pricingengines/analyticlgmswaptionengine.cpp b/qle/pricingengines/analyticlgmswaptionengine.cpp
 index 4c7612b..d9cc78d 100644
---- a/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp
+--- a/qle/pricingengines/analyticlgmswaptionengine.cpp
++++ b/qle/pricingengines/analyticlgmswaptionengine.cpp
 @@ -242,7 +242,7 @@ void AnalyticLgmSwaptionEngine::calculate() const {
      if (!caching_ || !lgm_alpha_constant_ || zetaex_ == Null<Real>()) {
          zetaex_ = p_->zeta(p_->termStructure()->timeFromReference(expiry)) -
@@ -28,10 +28,10 @@ index 4c7612b..d9cc78d 100644
                  std::bind(&AnalyticLgmSwaptionEngine::yStarHelper, this, std::placeholders::_1), 1.0E-2, -10.0, 10.0);
              yStar = b.solve(std::bind(&AnalyticLgmSwaptionEngine::yStarHelper, this, std::placeholders::_1), 1.0E-6,
                              startValue2, 0.01);
-diff --git a/QuantExt/qle/pricingengines/blackbondoptionengine.cpp b/QuantExt/qle/pricingengines/blackbondoptionengine.cpp
+diff --git a/qle/pricingengines/blackbondoptionengine.cpp b/qle/pricingengines/blackbondoptionengine.cpp
 index a84a18f..1a222f1 100644
---- a/QuantExt/qle/pricingengines/blackbondoptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/blackbondoptionengine.cpp
+--- a/qle/pricingengines/blackbondoptionengine.cpp
++++ b/qle/pricingengines/blackbondoptionengine.cpp
 @@ -66,12 +66,12 @@ void BlackBondOptionEngine::calculate() const {
          cfRes.type = "Underlying_Bond__" + cfRes.type;
      }
@@ -56,10 +56,10 @@ index a84a18f..1a222f1 100644
                                                               arguments_.underlying->notional(exerciseDate);
      }
      results_.value = optionValue;
-diff --git a/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp b/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp
+diff --git a/qle/pricingengines/blackindexcdsoptionengine.cpp b/qle/pricingengines/blackindexcdsoptionengine.cpp
 index 44dafa5..3405333 100644
---- a/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp
+--- a/qle/pricingengines/blackindexcdsoptionengine.cpp
++++ b/qle/pricingengines/blackindexcdsoptionengine.cpp
 @@ -164,7 +164,7 @@ void BlackIndexCdsOptionEngine::priceStrikeCalculate(Real fep) const {
          results_.additionalResults["discountToExerciseSwapCurrency"] = discSwapCurrToExercise;
          results_.additionalResults["upfront"] =
@@ -69,10 +69,10 @@ index 44dafa5..3405333 100644
          results_.additionalResults["forwardPrice"] = forwardPrice;
          results_.additionalResults["fepAdjustedForwardPrice"] = Fp;
          results_.additionalResults["volatility"] = volatility;
-diff --git a/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp b/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp
+diff --git a/qle/pricingengines/discountingfxforwardengine.cpp b/qle/pricingengines/discountingfxforwardengine.cpp
 index 965f3ab..8f9cc54 100644
---- a/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp
-+++ b/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp
+--- a/qle/pricingengines/discountingfxforwardengine.cpp
++++ b/qle/pricingengines/discountingfxforwardengine.cpp
 @@ -97,8 +97,8 @@ void DiscountingFxForwardEngine::calculate() const {
  
          Real discNear = settleCcy1 ? disc1near : disc2near;

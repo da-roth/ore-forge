@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/blackmultilegoptionengine.cpp b/QuantExt/qle/pricingengines/blackmultilegoptionengine.cpp
+diff --git a/qle/pricingengines/blackmultilegoptionengine.cpp b/qle/pricingengines/blackmultilegoptionengine.cpp
 index 18b21cb..a780e32 100644
---- a/QuantExt/qle/pricingengines/blackmultilegoptionengine.cpp
-+++ b/QuantExt/qle/pricingengines/blackmultilegoptionengine.cpp
+--- a/qle/pricingengines/blackmultilegoptionengine.cpp
++++ b/qle/pricingengines/blackmultilegoptionengine.cpp
 @@ -195,7 +195,7 @@ void BlackMultiLegOptionEngineBase::calculate() const {
                      cfInfo.back().discountFactor = discountCurve_->discount(c->date());
                      // mid cpn exercise assumes short coupon is paid
@@ -55,10 +55,10 @@ index 18b21cb..a780e32 100644
          }
      }
  
-diff --git a/QuantExt/qle/pricingengines/cbomcengine.cpp b/QuantExt/qle/pricingengines/cbomcengine.cpp
+diff --git a/qle/pricingengines/cbomcengine.cpp b/qle/pricingengines/cbomcengine.cpp
 index c69e6b2..095a277 100644
---- a/QuantExt/qle/pricingengines/cbomcengine.cpp
-+++ b/QuantExt/qle/pricingengines/cbomcengine.cpp
+--- a/qle/pricingengines/cbomcengine.cpp
++++ b/qle/pricingengines/cbomcengine.cpp
 @@ -46,8 +46,8 @@ namespace QuantExt {
          }
  

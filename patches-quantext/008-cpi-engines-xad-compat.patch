@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp
+diff --git a/qle/pricingengines/cpibacheliercapfloorengine.cpp b/qle/pricingengines/cpibacheliercapfloorengine.cpp
 index 60823ce..77f95d3 100644
---- a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp
-+++ b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp
+--- a/qle/pricingengines/cpibacheliercapfloorengine.cpp
++++ b/qle/pricingengines/cpibacheliercapfloorengine.cpp
 @@ -32,8 +32,8 @@ using namespace QuantLib;
  
  namespace QuantExt {
@@ -13,10 +13,10 @@ index 60823ce..77f95d3 100644
      return bachelierBlackFormula(type, strike, forward, stdDev, discount);
  }
  
-diff --git a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp
+diff --git a/qle/pricingengines/cpibacheliercapfloorengine.hpp b/qle/pricingengines/cpibacheliercapfloorengine.hpp
 index b408f8c..aa3545d 100644
---- a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp
-+++ b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp
+--- a/qle/pricingengines/cpibacheliercapfloorengine.hpp
++++ b/qle/pricingengines/cpibacheliercapfloorengine.hpp
 @@ -37,8 +37,8 @@ public:
      virtual ~CPIBachelierCapFloorEngine() = default;
  
@@ -28,10 +28,10 @@ index b408f8c..aa3545d 100644
  };
  
  } // namespace QuantExt
-diff --git a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp
+diff --git a/qle/pricingengines/cpiblackcapfloorengine.cpp b/qle/pricingengines/cpiblackcapfloorengine.cpp
 index 2cf4cc9..d7699b8 100644
---- a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp
-+++ b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp
+--- a/qle/pricingengines/cpiblackcapfloorengine.cpp
++++ b/qle/pricingengines/cpiblackcapfloorengine.cpp
 @@ -152,8 +152,8 @@ void CPICapFloorEngine::calculate() const {
  
  
@@ -43,10 +43,10 @@ index 2cf4cc9..d7699b8 100644
      return blackFormula(type, strike, forward, stdDev, discount);
  }
  } // namespace QuantExt
-diff --git a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp
+diff --git a/qle/pricingengines/cpiblackcapfloorengine.hpp b/qle/pricingengines/cpiblackcapfloorengine.hpp
 index 20abb52..0c65240 100644
---- a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp
-+++ b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp
+--- a/qle/pricingengines/cpiblackcapfloorengine.hpp
++++ b/qle/pricingengines/cpiblackcapfloorengine.hpp
 @@ -44,7 +44,7 @@ public:
      void setVolatility(const QuantLib::Handle<QuantLib::CPIVolatilitySurface>& surface);
  

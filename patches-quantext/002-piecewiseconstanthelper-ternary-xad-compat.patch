@@ -1,7 +1,7 @@
-diff --git a/QuantExt/qle/models/piecewiseconstanthelper.hpp b/QuantExt/qle/models/piecewiseconstanthelper.hpp
+diff --git a/qle/models/piecewiseconstanthelper.hpp b/qle/models/piecewiseconstanthelper.hpp
 index 44dd532..769afb9 100644
---- a/QuantExt/qle/models/piecewiseconstanthelper.hpp
-+++ b/QuantExt/qle/models/piecewiseconstanthelper.hpp
+--- a/qle/models/piecewiseconstanthelper.hpp
++++ b/qle/models/piecewiseconstanthelper.hpp
 @@ -272,8 +272,8 @@ inline void PiecewiseConstantHelper3::update() const {
      y2Union_ = Array(tUnion_.size() + 1);
      for (Size i = 0; i < tUnion_.size() + 1; ++i) {
