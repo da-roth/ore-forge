@@ -5,7 +5,7 @@ echo "======================================"
 echo "Installing additional dependencies..."
 echo "======================================"
 
-# Dependencies already in custom image
+apt-get update && apt-get install -y patch ninja-build
 
 echo ""
 echo "======================================"
@@ -24,7 +24,7 @@ mv Engine/QuantLib QuantLib
 
 git clone --depth 1 --branch "$XAD_BRANCH" https://github.com/$XAD_REPO.git xad-jit
 
-# Forge already in Docker image
+git clone --depth 1 --branch "$FORGE_BRANCH" https://github.com/$FORGE_REPO.git forge
 
 echo ""
 echo "======================================"
@@ -50,13 +50,25 @@ echo "======================================"
 echo "Building Forge..."
 echo "======================================"
 
-echo "Using pre-built Forge from Docker image"
+if [ "$CAPI" = "off" ]; then
+  echo "Building Forge (C++ API)"
+  cd /tmp/forge
+  cmake -B build -S tools/packaging -G Ninja -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCMAKE_INSTALL_PREFIX=/tmp/install
+  cmake --build build --config "$BUILD_TYPE"
+  cmake --install build --config "$BUILD_TYPE"
+else
+  echo "Building Forge (C API)"
+  cd /tmp/forge
+  cmake -B build -S tools/capi -G Ninja -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCMAKE_INSTALL_PREFIX=/tmp/install
+  cmake --build build --config "$BUILD_TYPE"
+  cmake --install build --config "$BUILD_TYPE"
+fi
 
 # Set the correct Forge install path based on C API setting
 if [ "$CAPI" = "off" ]; then
-  FORGE_PREFIX="/opt/forge"
+  FORGE_PREFIX="/tmp/install"
 else
-  FORGE_PREFIX="/opt/forge-capi"
+  FORGE_PREFIX="/tmp/install"
 fi
 
 echo ""
