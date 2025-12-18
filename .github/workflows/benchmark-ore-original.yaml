@@ -1,0 +1,162 @@
+##############################################################################
+#
+#  ORE Example 3 CVA Benchmark - Original (No AAD)
+#
+#  Builds vanilla ORE and runs Example 3 CVA benchmark.
+#  This serves as the performance baseline (no automatic differentiation).
+#
+#  Copyright (C) 2025 The ORE-Forge Authors
+#
+#  SPDX-License-Identifier: AGPL-3.0-or-later
+#
+##############################################################################
+
+name: Benchmark ORE Original
+
+on:
+  workflow_dispatch:
+    inputs:
+      ore_repo:
+        description: ORE Engine repository
+        required: true
+        default: OpenSourceRisk/Engine
+      ore_branch:
+        description: Branch or tag for ORE Engine
+        required: true
+        default: v1.8.14.0
+
+env:
+  ore_repo: ${{ github.event.inputs.ore_repo || 'OpenSourceRisk/Engine' }}
+  ore_branch: ${{ github.event.inputs.ore_branch || 'v1.8.14.0' }}
+
+jobs:
+  benchmark-original:
+    runs-on: ubuntu-latest
+    container: ghcr.io/lballabio/quantlib-devenv:rolling
+
+    name: ORE Original (No AAD)
+
+    steps:
+      - name: Checkout ORE Engine
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: recursive
+
+      - name: Checkout ORE-Forge (for benchmark code)
+        uses: actions/checkout@v4
+        with:
+          path: ORE-Forge
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: benchmark-ore-original
+          max-size: 1G
+
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
+
+      # Build vanilla ORE (no XAD)
+      - name: Configure ORE
+        run: |
+          cd Engine
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DBOOST_ROOT=/usr \
+            -DQL_NULL_AS_FUNCTIONS=ON \
+            -DORE_BUILD_DOC=OFF \
+            -DORE_BUILD_EXAMPLES=ON \
+            -DORE_BUILD_TESTS=OFF \
+            -DORE_BUILD_SWIG=OFF
+
+      - name: Build ORE
+        run: |
+          cd Engine/build
+          cmake --build .
+
+      # Build benchmark executable
+      - name: Build Benchmark
+        run: |
+          cd ORE-Forge/OREAnalytics-benchmark
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DBOOST_ROOT=/usr \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../../Engine/build \
+            -DORE_BUILD_BENCHMARK=ON \
+            -DQLRISKS_DISABLE_AAD=ON
+          cmake --build build --target example3_benchmark_original || echo "Building standalone..."
+
+          # If CMake integration fails, build standalone
+          if [ ! -f build/example3_benchmark_original ]; then
+            echo "Building standalone benchmark..."
+            g++ -std=c++17 -O3 \
+              -I../../Engine/QuantLib \
+              -I../../Engine/QuantExt \
+              -I../../Engine/OREData \
+              -I../../Engine/OREAnalytics \
+              -I/usr/include \
+              example3_benchmark_original.cpp \
+              -L../../Engine/build/QuantLib \
+              -L../../Engine/build/QuantExt \
+              -L../../Engine/build/OREData \
+              -L../../Engine/build/OREAnalytics \
+              -lOREAnalytics -lOREData -lQuantExt -lQuantLib \
+              -lboost_system -lboost_filesystem -lboost_serialization \
+              -lpthread \
+              -o example3_benchmark_original
+          fi
+
+      # Run benchmark
+      - name: Run Benchmark
+        run: |
+          cd Engine/Examples/Legacy/Example_3
+
+          echo "=============================================="
+          echo "ORE Example 3 CVA Benchmark - Original"
+          echo "=============================================="
+          echo ""
+
+          # Find and run benchmark
+          BENCHMARK=""
+          if [ -f ../../../ORE-Forge/OREAnalytics-benchmark/build/example3_benchmark_original ]; then
+            BENCHMARK="../../../ORE-Forge/OREAnalytics-benchmark/build/example3_benchmark_original"
+          elif [ -f ../../../ORE-Forge/OREAnalytics-benchmark/example3_benchmark_original ]; then
+            BENCHMARK="../../../ORE-Forge/OREAnalytics-benchmark/example3_benchmark_original"
+          else
+            # Fall back to timing the ore executable directly
+            echo "Benchmark executable not found, timing ore directly..."
+            for i in 1 2 3 4 5; do
+              echo "Warmup $i..."
+              ../../../build/App/ore Input/ore.xml > /dev/null 2>&1
+            done
+            echo ""
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              start=$(date +%s.%N)
+              ../../../build/App/ore Input/ore.xml > /dev/null 2>&1
+              end=$(date +%s.%N)
+              elapsed=$(echo "$end - $start" | bc)
+              echo "Iteration $i: ${elapsed}s"
+            done
+            exit 0
+          fi
+
+          # Run C++ benchmark
+          LD_LIBRARY_PATH=../../../build/OREAnalytics:../../../build/OREData:../../../build/QuantExt:../../../build/QuantLib:$LD_LIBRARY_PATH \
+            $BENCHMARK Input/ore.xml
+
+      - name: Benchmark Summary
+        run: |
+          echo "## ORE Example 3 CVA Benchmark - Original" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ORE Version | ${{ env.ore_branch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| AAD | Disabled (double precision) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Example | Example 3 (Swaption CVA) |" >> $GITHUB_STEP_SUMMARY

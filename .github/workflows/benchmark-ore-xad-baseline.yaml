@@ -1,0 +1,173 @@
+##############################################################################
+#
+#  ORE Example 3 CVA Benchmark - XAD Tape (Reverse-Mode AAD)
+#
+#  Builds ORE with XAD-enabled QuantLib and runs Example 3 CVA benchmark.
+#  Uses XAD tape-based automatic differentiation for sensitivities.
+#
+#  Copyright (C) 2025 The ORE-Forge Authors
+#
+#  SPDX-License-Identifier: AGPL-3.0-or-later
+#
+##############################################################################
+
+name: Benchmark ORE XAD Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      ore_repo:
+        description: ORE Engine repository
+        required: true
+        default: OpenSourceRisk/Engine
+      ore_branch:
+        description: Branch or tag for ORE Engine
+        required: true
+        default: v1.8.14.0
+      xad_repo:
+        description: XAD repository (original, no JIT)
+        required: true
+        default: auto-differentiation/xad
+      xad_branch:
+        description: Branch for XAD
+        required: true
+        default: main
+      qlrisks_repo:
+        description: QuantLib-Risks-Cpp repository
+        required: true
+        default: auto-differentiation/QuantLib-Risks-Cpp
+      qlrisks_branch:
+        description: Branch for QuantLib-Risks-Cpp
+        required: true
+        default: main
+
+env:
+  ore_repo: ${{ github.event.inputs.ore_repo || 'OpenSourceRisk/Engine' }}
+  ore_branch: ${{ github.event.inputs.ore_branch || 'v1.8.14.0' }}
+  xad_repo: ${{ github.event.inputs.xad_repo || 'auto-differentiation/xad' }}
+  xad_branch: ${{ github.event.inputs.xad_branch || 'main' }}
+  qlrisks_repo: ${{ github.event.inputs.qlrisks_repo || 'auto-differentiation/QuantLib-Risks-Cpp' }}
+  qlrisks_branch: ${{ github.event.inputs.qlrisks_branch || 'main' }}
+
+jobs:
+  benchmark-xad:
+    runs-on: ubuntu-latest
+    container: ghcr.io/lballabio/quantlib-devenv:rolling
+
+    name: ORE XAD Baseline (Tape AAD)
+
+    steps:
+      - name: Checkout ORE Engine
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: recursive
+
+      - name: Checkout XAD (Original - no JIT)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.xad_repo }}
+          ref: ${{ env.xad_branch }}
+          path: xad
+
+      - name: Checkout QuantLib-Risks-Cpp
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.qlrisks_repo }}
+          ref: ${{ env.qlrisks_branch }}
+          path: QuantLib-Risks-Cpp
+
+      - name: Checkout ORE-Forge (for patches and benchmark code)
+        uses: actions/checkout@v4
+        with:
+          path: ORE-Forge
+
+      - name: Apply patches to QuantLib
+        run: |
+          cd Engine/QuantLib
+          for patch in ../../ORE-Forge/patches/*.patch; do
+            if [ -f "$patch" ]; then
+              echo "Applying: $patch"
+              patch -p1 < "$patch"
+            fi
+          done
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: benchmark-ore-xad-baseline
+          max-size: 1G
+
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
+
+      # Build ORE with XAD (no tests)
+      - name: Configure ORE with XAD
+        run: |
+          cd Engine
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DBOOST_ROOT=/usr \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad;$(pwd)/../QuantLib-Risks-Cpp" \
+            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
+            -DQL_NULL_AS_FUNCTIONS=ON \
+            -DXAD_WARNINGS_PARANOID=OFF \
+            -DQL_BUILD_TEST_SUITE=OFF \
+            -DQL_BUILD_EXAMPLES=OFF \
+            -DQL_BUILD_BENCHMARK=OFF \
+            -DQLRISKS_DISABLE_AAD=OFF \
+            -DQLRISKS_BUILD_TEST_SUITE=OFF \
+            -DORE_BUILD_DOC=OFF \
+            -DORE_BUILD_EXAMPLES=ON \
+            -DORE_BUILD_TESTS=OFF \
+            -DORE_BUILD_SWIG=OFF
+
+      - name: Build ORE
+        run: |
+          cd Engine/build
+          cmake --build .
+
+      # Run benchmark using ore executable with timing
+      - name: Run Benchmark
+        run: |
+          cd Engine/Examples/Legacy/Example_3
+
+          echo "=============================================="
+          echo "ORE Example 3 CVA Benchmark - XAD Baseline"
+          echo "=============================================="
+          echo "XAD: ${{ env.xad_branch }} (original, tape-based)"
+          echo ""
+
+          # Warmup
+          echo "Running warmup iterations..."
+          for i in 1 2 3; do
+            echo "  Warmup $i/3..."
+            ../../../build/App/ore Input/ore.xml > /dev/null 2>&1
+          done
+          echo ""
+
+          # Benchmark
+          echo "Running benchmark iterations..."
+          for i in 1 2 3 4 5; do
+            start=$(date +%s.%N)
+            ../../../build/App/ore Input/ore.xml > /dev/null 2>&1
+            end=$(date +%s.%N)
+            elapsed=$(echo "$end - $start" | bc)
+            echo "  Iteration $i/5: ${elapsed}s"
+          done
+
+      - name: Benchmark Summary
+        run: |
+          echo "## ORE Example 3 CVA Benchmark - XAD Baseline" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ORE Version | ${{ env.ore_branch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| XAD | ${{ env.xad_branch }} (tape-based) |" >> $GITHUB_STEP_SUMMARY
+          echo "| AAD | Enabled (Real = xad::AReal<double>) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Example | Example 3 (Swaption CVA) |" >> $GITHUB_STEP_SUMMARY
