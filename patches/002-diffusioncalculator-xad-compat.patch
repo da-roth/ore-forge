@@ -1,49 +1,7 @@
 diff --git a/ql/pricingengines/diffusioncalculator.cpp b/ql/pricingengines/diffusioncalculator.cpp
-index df88638..f30fddd 100644
+index df88638..b8cdde3 100644
 --- a/ql/pricingengines/diffusioncalculator.cpp
 +++ b/ql/pricingengines/diffusioncalculator.cpp
-@@ -25,32 +25,32 @@
- #include <ql/pricingengines/diffusioncalculator.hpp>
- namespace QuantLib {
- 
--    double convertNormalToShiftedLogNormalVol(
-+    Real convertNormalToShiftedLogNormalVol(
-         double forward, double strike, double ttm, double nVol, double displacement) {
-         QL_REQUIRE(!close_enough(forward, 0.0), "forward is 0.0, can not convert normal vol to shifted lognormal vol");
-         auto optionType = forward > strike ? Option::Type::Put : Option::Type::Call;
--        double premium = bachelierBlackFormula(optionType, strike, forward, nVol * std::sqrt(ttm));
--        double slnVol =
-+        Real premium = bachelierBlackFormula(optionType, strike, forward, nVol * std::sqrt(ttm));
-+        Real slnVol =
-             blackFormulaImpliedStdDev(optionType, strike, forward, premium, 1.0, displacement, nVol / forward );
-         return slnVol / sqrt(ttm);
-     }
- 
--    double convertShiftedLognormalToNormalVol(
-+    Real convertShiftedLognormalToNormalVol(
-         double forward, double strike, double ttm, double slnVol, double displacement) {
-         auto optionType = forward > strike ? Option::Type::Put : Option::Type::Call;
--        double price = blackFormula(optionType, strike, forward, slnVol * std::sqrt(ttm), 1.0, displacement);
--        double nVol = bachelierBlackFormulaImpliedVol(optionType, strike, forward, ttm, price);
-+        Real price = blackFormula(optionType, strike, forward, slnVol * std::sqrt(ttm), 1.0, displacement);
-+        Real nVol = bachelierBlackFormulaImpliedVol(optionType, strike, forward, ttm, price);
-         return nVol;
-     }
- 
--    double convertShiftedLognormalToShiftedLognormalVol(
-+    Real convertShiftedLognormalToShiftedLognormalVol(
-         double forward, double strike, double ttm, double slnVol, double oldDisplacement,
-         double newDisplacement) {
-         if (close_enough(oldDisplacement, newDisplacement))
-             return slnVol;
-         auto optionType = forward > strike ? Option::Type::Put : Option::Type::Call;
--        double price = blackFormula(optionType, strike, forward, slnVol, 1.0, oldDisplacement);
--        double newSlnVol =
-+        Real price = blackFormula(optionType, strike, forward, slnVol, 1.0, oldDisplacement);
-+        Real newSlnVol =
-             blackFormulaImpliedStdDev(optionType, strike, forward, price, 1.0, newDisplacement);
-         return newSlnVol / sqrt(ttm);
-     }
 @@ -78,17 +78,17 @@ namespace QuantLib {
          if (inputVolType == VolatilityType::ShiftedLognormal &&
              targetVolType == VolatilityType::Normal) {
@@ -87,26 +45,3 @@ index df88638..f30fddd 100644
                                        t);
      }
  
-diff --git a/ql/pricingengines/diffusioncalculator.hpp b/ql/pricingengines/diffusioncalculator.hpp
-index fa2844a..d8f85ba 100644
---- a/ql/pricingengines/diffusioncalculator.hpp
-+++ b/ql/pricingengines/diffusioncalculator.hpp
-@@ -69,12 +69,16 @@ namespace QuantLib {
-                            double t);
- 
- 
--    double convertNormalToShiftedLogNormalVol(
-+    Real convertNormalToShiftedLogNormalVol(
-         double forward, double strike, double ttm, double nVol, double displacement);
- 
--    double convertShiftedLognormalToNormalVol(
-+    Real convertShiftedLognormalToNormalVol(
-         double forward, double strike, double ttm, double slnVol, double displacement);
- 
-+    Real convertShiftedLognormalToShiftedLognormalVol(
-+        double forward, double strike, double ttm, double slnVol, double oldDisplacement,
-+        double newDisplacement);
-+
- 
-     //! Calculator class supporting shifted lognormal (Black) and normal (Bachelier) models
-     /*! \bug When the variance is null, division by zero occur during
