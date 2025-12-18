@@ -1,0 +1,69 @@
+diff --git a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp
+index 60823ce..77f95d3 100644
+--- a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp
++++ b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.cpp
+@@ -32,8 +32,8 @@ using namespace QuantLib;
+ 
+ namespace QuantExt {
+ 
+-double CPIBachelierCapFloorEngine::optionPriceImpl(QuantLib::Option::Type type, double strike, double forward,
+-                                               double stdDev, double discount) const {
++Real CPIBachelierCapFloorEngine::optionPriceImpl(QuantLib::Option::Type type, Real strike, Real forward,
++                                               Real stdDev, Real discount) const {
+     return bachelierBlackFormula(type, strike, forward, stdDev, discount);
+ }
+ 
+diff --git a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp
+index b408f8c..aa3545d 100644
+--- a/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp
++++ b/QuantExt/qle/pricingengines/cpibacheliercapfloorengine.hpp
+@@ -37,8 +37,8 @@ public:
+     virtual ~CPIBachelierCapFloorEngine() = default;
+ 
+ protected:
+-    virtual double optionPriceImpl(QuantLib::Option::Type type, double forward, double strike, double stdDev,
+-                                   double discount) const override;
++    virtual QuantLib::Real optionPriceImpl(QuantLib::Option::Type type, QuantLib::Real forward, QuantLib::Real strike, QuantLib::Real stdDev,
++                                   QuantLib::Real discount) const override;
+ };
+ 
+ } // namespace QuantExt
+diff --git a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp
+index 2cf4cc9..d7699b8 100644
+--- a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp
++++ b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.cpp
+@@ -152,8 +152,8 @@ void CPICapFloorEngine::calculate() const {
+ 
+ 
+ 
+-double CPIBlackCapFloorEngine::optionPriceImpl(QuantLib::Option::Type type, double strike, double forward,
+-                                               double stdDev, double discount) const {
++Real CPIBlackCapFloorEngine::optionPriceImpl(QuantLib::Option::Type type, Real strike, Real forward,
++                                               Real stdDev, Real discount) const {
+     return blackFormula(type, strike, forward, stdDev, discount);
+ }
+ } // namespace QuantExt
+diff --git a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp
+index 20abb52..0c65240 100644
+--- a/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp
++++ b/QuantExt/qle/pricingengines/cpiblackcapfloorengine.hpp
+@@ -44,7 +44,7 @@ public:
+     void setVolatility(const QuantLib::Handle<QuantLib::CPIVolatilitySurface>& surface);
+ 
+ protected:
+-    virtual double optionPriceImpl(QuantLib::Option::Type type, double forward, double strike, double stdDev, double discount) const = 0;
++    virtual QuantLib::Real optionPriceImpl(QuantLib::Option::Type type, QuantLib::Real forward, QuantLib::Real strike, QuantLib::Real stdDev, QuantLib::Real discount) const = 0;
+     QuantLib::Handle<QuantLib::YieldTermStructure> discountCurve_;
+     QuantLib::Handle<QuantLib::CPIVolatilitySurface> volatilitySurface_;
+     bool ttmFromLastAvailableFixing_;
+@@ -60,8 +60,8 @@ public:
+     virtual ~CPIBlackCapFloorEngine() = default;
+ 
+ protected:
+-    virtual double optionPriceImpl(QuantLib::Option::Type type, double strike, double forward, double stdDev,
+-                                   double discount) const override;
++    virtual QuantLib::Real optionPriceImpl(QuantLib::Option::Type type, QuantLib::Real strike, QuantLib::Real forward, QuantLib::Real stdDev,
++                                   QuantLib::Real discount) const override;
+ };
+ 
+ } // namespace QuantExt

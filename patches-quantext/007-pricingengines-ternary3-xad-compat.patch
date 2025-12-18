@@ -1,0 +1,86 @@
+diff --git a/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp b/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp
+index 4c7612b..d9cc78d 100644
+--- a/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp
++++ b/QuantExt/qle/pricingengines/analyticlgmswaptionengine.cpp
+@@ -242,7 +242,7 @@ void AnalyticLgmSwaptionEngine::calculate() const {
+     if (!caching_ || !lgm_alpha_constant_ || zetaex_ == Null<Real>()) {
+         zetaex_ = p_->zeta(p_->termStructure()->timeFromReference(expiry)) -
+                   p_->zeta(p_->termStructure()->timeFromReference(reference)) +
+-                  (applyZetaShift_ ? zetaShift_ * zetaShiftT_ : 0.0);
++                  (applyZetaShift_ ? Real(zetaShift_ * zetaShiftT_) : Real(0.0));
+     }
+ 
+     Brent b;
+@@ -260,14 +260,14 @@ void AnalyticLgmSwaptionEngine::calculate() const {
+                                 0.0, 0.01);
+             } catch (const std::exception& e) { // Try Brent with optimized starting point
+                 Bisection b2;
+-                double startValue = b2.solve(
++                Real startValue = b2.solve(
+                     std::bind(&AnalyticLgmSwaptionEngine::yStarHelper, this, std::placeholders::_1), 1.0E-2, -3.0, 3.0);
+                 yStar = b.solve(std::bind(&AnalyticLgmSwaptionEngine::yStarHelper, this, std::placeholders::_1), 1.0E-6,
+                                 startValue, 0.01);
+             }
+         } catch (const std::exception& e) { // Try Brent with another optimized starting point
+             Bisection b2;
+-            double startValue2 = b2.solve(
++            Real startValue2 = b2.solve(
+                 std::bind(&AnalyticLgmSwaptionEngine::yStarHelper, this, std::placeholders::_1), 1.0E-2, -10.0, 10.0);
+             yStar = b.solve(std::bind(&AnalyticLgmSwaptionEngine::yStarHelper, this, std::placeholders::_1), 1.0E-6,
+                             startValue2, 0.01);
+diff --git a/QuantExt/qle/pricingengines/blackbondoptionengine.cpp b/QuantExt/qle/pricingengines/blackbondoptionengine.cpp
+index a84a18f..1a222f1 100644
+--- a/QuantExt/qle/pricingengines/blackbondoptionengine.cpp
++++ b/QuantExt/qle/pricingengines/blackbondoptionengine.cpp
+@@ -66,12 +66,12 @@ void BlackBondOptionEngine::calculate() const {
+         cfRes.type = "Underlying_Bond__" + cfRes.type;
+     }
+ 
+-    Real knockOutProbability = defaultCurve_.empty() ? 0.0 : 1.0 - defaultCurve_->survivalProbability(exerciseDate);
++    Real knockOutProbability = defaultCurve_.empty() ? Real(0.0) : Real(1.0 - defaultCurve_->survivalProbability(exerciseDate));
+ 
+     // adjust forward if option does not knock out (option is on the recovery value if bond defaults before expiry)
+     if (!arguments_.knocksOutOnDefault) {
+         fwdNpv = (1.0 - knockOutProbability) * fwdNpv + knockOutProbability *
+-                                                            (recoveryRate_.empty() ? 0.0 : recoveryRate_->value()) *
++                                                            (recoveryRate_.empty() ? Real(0.0) : Real(recoveryRate_->value())) *
+                                                             arguments_.underlying->notional(exerciseDate);
+     }
+ 
+@@ -164,7 +164,7 @@ void BlackBondOptionEngine::calculate() const {
+     // results_.additionalResults["DirtyBondPrice"] = arguments_.underlying->dirtyPrice();
+     if (!arguments_.knocksOutOnDefault) {
+         results_.additionalResults["ExpectedBondRecovery"] = knockOutProbability *
+-                                                             (recoveryRate_.empty() ? 0.0 : recoveryRate_->value()) *
++                                                             (recoveryRate_.empty() ? Real(0.0) : Real(recoveryRate_->value())) *
+                                                              arguments_.underlying->notional(exerciseDate);
+     }
+     results_.value = optionValue;
+diff --git a/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp b/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp
+index 44dafa5..3405333 100644
+--- a/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp
++++ b/QuantExt/qle/pricingengines/blackindexcdsoptionengine.cpp
+@@ -164,7 +164,7 @@ void BlackIndexCdsOptionEngine::priceStrikeCalculate(Real fep) const {
+         results_.additionalResults["discountToExerciseSwapCurrency"] = discSwapCurrToExercise;
+         results_.additionalResults["upfront"] =
+             npv *
+-            (arguments_.settlementType == Settlement::Cash ? discTradeCollToExercise / discSwapCurrToExercise : 1.0);
++            (arguments_.settlementType == Settlement::Cash ? Real(discTradeCollToExercise / discSwapCurrToExercise) : Real(1.0));
+         results_.additionalResults["forwardPrice"] = forwardPrice;
+         results_.additionalResults["fepAdjustedForwardPrice"] = Fp;
+         results_.additionalResults["volatility"] = volatility;
+diff --git a/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp b/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp
+index 965f3ab..8f9cc54 100644
+--- a/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp
++++ b/QuantExt/qle/pricingengines/discountingfxforwardengine.cpp
+@@ -97,8 +97,8 @@ void DiscountingFxForwardEngine::calculate() const {
+ 
+         Real discNear = settleCcy1 ? disc1near : disc2near;
+         Real discFar = settleCcy1 ? disc1far : disc2far;
+-        Real fx1 = settleCcy1 ? 1.0 : fxfwd;
+-        Real fx2 = settleCcy1 ? 1 / fxfwd : 1.0;
++        Real fx1 = settleCcy1 ? Real(1.0) : Real(fxfwd);
++        Real fx2 = settleCcy1 ? Real(1.0 / fxfwd) : Real(1.0);
+ 
+         QL_REQUIRE(arguments_.isPhysicallySettled || arguments_.payDate <= arguments_.fixingDate ||
+                        arguments_.fxIndex != nullptr,

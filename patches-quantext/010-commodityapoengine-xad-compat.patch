@@ -1,0 +1,98 @@
+diff --git a/QuantExt/qle/pricingengines/commodityapoengine.cpp b/QuantExt/qle/pricingengines/commodityapoengine.cpp
+index 79924d7..4a9ef1f 100644
+--- a/QuantExt/qle/pricingengines/commodityapoengine.cpp
++++ b/QuantExt/qle/pricingengines/commodityapoengine.cpp
+@@ -44,12 +44,12 @@ QuantLib::Real MomentMatchingResults::stdDev() { return std::sqrt(secondMoment()
+ QuantLib::Time MomentMatchingResults::timeToExpiry() { return tn; }
+ 
+ 
+-double
+-calcEA2FutureContracts(const std::vector<double>& forwards, const std::vector<double>& futureVols,
++Real
++calcEA2FutureContracts(const std::vector<Real>& forwards, const std::vector<Real>& futureVols,
+                        const std::vector<Date>& futureExpiries, const std::vector<Time>& pricingTimes,
+-                       const std::function<double(const QuantLib::Date& expiry1, const QuantLib::Date& expiry2)>& rho,
++                       const std::function<Real(const QuantLib::Date& expiry1, const QuantLib::Date& expiry2)>& rho,
+                        bool useBachelierModel = false) {
+-    double EA2 = 0.0;
++    Real EA2 = 0.0;
+     for (Size i = 0; i < forwards.size(); ++i) {
+         Date e_i = futureExpiries[i];
+         Volatility v_i = futureVols[i];
+@@ -58,7 +58,7 @@ calcEA2FutureContracts(const std::vector<double>& forwards, const std::vector<do
+         for (Size j = 0; j < i; ++j) {
+             Date e_j = futureExpiries[j];
+             Volatility v_j = futureVols[j];
+-            double corr = rho(e_i, e_j);
++            Real corr = rho(e_i, e_j);
+             EA2 += useBachelierModel ? 2 * corr * v_i * v_j * pricingTimes[j]
+                                      : 2 * forwards[i] * forwards[j] * exp(corr * v_i * v_j * pricingTimes[j]);
+         }
+@@ -66,9 +66,9 @@ calcEA2FutureContracts(const std::vector<double>& forwards, const std::vector<do
+     return EA2;
+ }
+ 
+-double calcEA2Spot(const std::vector<double>& forwards, const std::vector<double>& spotVariances,
++Real calcEA2Spot(const std::vector<Real>& forwards, const std::vector<Real>& spotVariances,
+                    bool useBachelierModel) {
+-    double EA2 = 0.0;
++    Real EA2 = 0.0;
+     for (Size i = 0; i < forwards.size(); ++i) {
+         EA2 += useBachelierModel ? spotVariances[i] : forwards[i] * forwards[i] * exp(spotVariances[i]);
+         for (Size j = 0; j < i; ++j) {
+@@ -78,9 +78,9 @@ double calcEA2Spot(const std::vector<double>& forwards, const std::vector<double
+     return EA2;
+ }
+ 
+-double calcualteSigma(const double EA, const double EA2, const double ttm, bool useBachelierModel) {
++Real calcualteSigma(const Real EA, const Real EA2, const Real ttm, bool useBachelierModel) {
+     if (!useBachelierModel) {
+-        double s = EA2 / (EA * EA);
++        Real s = EA2 / (EA * EA);
+         return s < 1.0 || QuantLib::close_enough(s, 1.0) ? 0.0 : std::sqrt(std::log(s) / ttm);
+     }
+     return sqrt(EA2 / ttm);
+@@ -89,7 +89,7 @@ double calcualteSigma(const double EA, const double EA2, const double ttm, bool
+ MomentMatchingResults matchFirstTwoMomentsTurnbullWakeman(
+     const ext::shared_ptr<CommodityIndexedAverageCashFlow>& flow,
+     const ext::shared_ptr<QuantLib::BlackVolTermStructure>& vol,
+-    const std::function<double(const QuantLib::Date& expiry1, const QuantLib::Date& expiry2)>& rho,
++    const std::function<Real(const QuantLib::Date& expiry1, const QuantLib::Date& expiry2)>& rho,
+     QuantLib::Real strike, const QuantLib::Date& exerciseDate, DiffusionModelType modelType,
+     const Real displacement) {
+ 
+@@ -99,13 +99,13 @@ MomentMatchingResults matchFirstTwoMomentsTurnbullWakeman(
+ 
+     res.tn = 0.0;
+     res.accruals = 0.0;
+-    double EA = 0;
++    Real EA = 0;
+     std::vector<Date> futureExpiries;
+     std::vector<Date> optionExpiries;
+     std::map<Date, Real> futureVols;
+-    std::vector<double> spotVariances;
++    std::vector<Real> spotVariances;
+     size_t n = flow->indices().size();
+-    double atmUnderlyingCcy = 0;
++    Real atmUnderlyingCcy = 0;
+ 
+     for (const auto& [pricingDate, index] : flow->indices()) {
+         Date fixingDate = std::min(optionExerciseDate, pricingDate);
+@@ -122,7 +122,7 @@ MomentMatchingResults matchFirstTwoMomentsTurnbullWakeman(
+             res.forwards.push_back(res.fixings.back());
+             res.times.push_back(vol->timeFromReference(pricingDate));
+             // use ATM vol if no strike is given
+-            double K = strike == Null<Real>() ? atmUnderlyingCcy : strike;
++            Real K = strike == Null<Real>() ? atmUnderlyingCcy : strike;
+             if (flow->useFuturePrice()) {
+                 Date expiry = index->expiryDate();
+                 Date optionExpiry = index->optionExpiryDate();
+@@ -158,7 +158,7 @@ MomentMatchingResults matchFirstTwoMomentsTurnbullWakeman(
+ 
+     bool useBachelierModel = res.volType == QuantLib::VolatilityType::Normal;
+ 
+-    double EA2 = flow->useFuturePrice() ? calcEA2FutureContracts(res.forwards, res.futureVols, futureExpiries,
++    Real EA2 = flow->useFuturePrice() ? calcEA2FutureContracts(res.forwards, res.futureVols, futureExpiries,
+                                                                  res.times, rho, useBachelierModel)
+                                         : calcEA2Spot(res.forwards, spotVariances, useBachelierModel);
+ 
