@@ -25,12 +25,14 @@ on:
     paths:
       - '.github/workflows/ci-ore.yaml'
       - 'patches/**'
+      - 'patches-quantext/**'
       - 'src/**'
       - 'ql/**'
   pull_request:
     paths:
       - '.github/workflows/ci-ore.yaml'
       - 'patches/**'
+      - 'patches-quantext/**'
       - 'src/**'
       - 'ql/**'
   workflow_dispatch:
@@ -123,6 +125,19 @@ jobs:
             fi
           done
           echo "Patches applied successfully."
+
+      # Apply patches for XAD compatibility to QuantExt
+      - name: Apply patches to QuantExt
+        run: |
+          cd Engine/QuantExt
+          echo "Applying ORE-Forge patches to QuantExt..."
+          for patch in ../../ORE-Forge/patches-quantext/*.patch; do
+            if [ -f "$patch" ]; then
+              echo "Applying: $patch"
+              patch -p1 < "$patch"
+            fi
+          done
+          echo "QuantExt patches applied successfully."
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.12
