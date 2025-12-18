@@ -1,8 +1,8 @@
 diff --git a/ql/pricingengines/diffusioncalculator.cpp b/ql/pricingengines/diffusioncalculator.cpp
-index df88638..560c8df 100644
+index df88638..919ca68 100644
 --- a/ql/pricingengines/diffusioncalculator.cpp
 +++ b/ql/pricingengines/diffusioncalculator.cpp
-@@ -25,21 +25,21 @@
+@@ -25,32 +25,32 @@
  #include <ql/pricingengines/diffusioncalculator.hpp>
  namespace QuantLib {
  
@@ -30,7 +30,10 @@ index df88638..560c8df 100644
          return nVol;
      }
  
-@@ -49,8 +49,8 @@ namespace QuantLib {
+-    double convertShiftedLognormalToShiftedLognormalVol(
++    Real convertShiftedLognormalToShiftedLognormalVol(
+         double forward, double strike, double ttm, double slnVol, double oldDisplacement,
+         double newDisplacement) {
          if (close_enough(oldDisplacement, newDisplacement))
              return slnVol;
          auto optionType = forward > strike ? Option::Type::Put : Option::Type::Call;
@@ -41,39 +44,46 @@ index df88638..560c8df 100644
              blackFormulaImpliedStdDev(optionType, strike, forward, price, 1.0, newDisplacement);
          return newSlnVol / sqrt(ttm);
      }
-@@ -78,7 +78,7 @@ namespace QuantLib {
+@@ -78,17 +78,17 @@ namespace QuantLib {
          if (inputVolType == VolatilityType::ShiftedLognormal &&
              targetVolType == VolatilityType::Normal) {
              double slnVol = inputVol;
 -            double nVol =
 +            Real nVol =
                  convertShiftedLognormalToNormalVol(forward, strike, t, slnVol, inputDisplacement);
-             return std::make_tuple(nVol, VolatilityType::Normal, targetDisplacement);
+-            return std::make_tuple(nVol, VolatilityType::Normal, targetDisplacement);
++            return std::make_tuple(static_cast<double>(nVol), VolatilityType::Normal, targetDisplacement);
          }
-@@ -86,7 +86,7 @@ namespace QuantLib {
+ 
          if (inputVolType == VolatilityType::Normal &&
              targetVolType == VolatilityType::ShiftedLognormal) {
              double nVol = inputVol;
 -            double slnVol =
 +            Real slnVol =
                  convertNormalToShiftedLogNormalVol(forward, strike, t, nVol, targetDisplacement);
-             return std::make_tuple(slnVol, VolatilityType::ShiftedLognormal, targetDisplacement);
+-            return std::make_tuple(slnVol, VolatilityType::ShiftedLognormal, targetDisplacement);
++            return std::make_tuple(static_cast<double>(slnVol), VolatilityType::ShiftedLognormal, targetDisplacement);
          }
-@@ -96,7 +96,7 @@ namespace QuantLib {
+ 
+         if (inputVolType == VolatilityType::ShiftedLognormal &&
+@@ -96,9 +96,9 @@ namespace QuantLib {
              !close_enough(inputDisplacement, targetDisplacement)) {
              // need to convert the vol to the new displacement
              double slnVol = inputVol;
 -            double newSlnVol = convertShiftedLognormalToShiftedLognormalVol(
 +            Real newSlnVol = convertShiftedLognormalToShiftedLognormalVol(
                  forward, strike, t, slnVol, inputDisplacement, targetDisplacement);
-             return std::make_tuple(newSlnVol, VolatilityType::ShiftedLognormal,
+-            return std::make_tuple(newSlnVol, VolatilityType::ShiftedLognormal,
++            return std::make_tuple(static_cast<double>(newSlnVol), VolatilityType::ShiftedLognormal,
                                     targetDisplacement);
+         }
+ 
 @@ -114,8 +114,10 @@ namespace QuantLib {
                                         double forward,
                                         double strike,
                                         double t) {
-+        Real shift = volTS->shift();
-+        Real blackVol = volTS->blackVol(t, strike);
++        double shift = volTS->shift();
++        double blackVol = volTS->blackVol(t, strike);
          return convertInputVolatility(outputModelType, displacement, volTS->volType(),
 -                                      volTS->shift(), volTS->blackVol(t, strike), forward, strike,
 +                                      shift, blackVol, forward, strike,
@@ -81,10 +91,10 @@ index df88638..560c8df 100644
      }
  
 diff --git a/ql/pricingengines/diffusioncalculator.hpp b/ql/pricingengines/diffusioncalculator.hpp
-index fa2844a..736239e 100644
+index fa2844a..d8f85ba 100644
 --- a/ql/pricingengines/diffusioncalculator.hpp
 +++ b/ql/pricingengines/diffusioncalculator.hpp
-@@ -69,10 +69,10 @@ namespace QuantLib {
+@@ -69,12 +69,16 @@ namespace QuantLib {
                             double t);
  
  
@@ -96,4 +106,10 @@ index fa2844a..736239e 100644
 +    Real convertShiftedLognormalToNormalVol(
          double forward, double strike, double ttm, double slnVol, double displacement);
  
++    Real convertShiftedLognormalToShiftedLognormalVol(
++        double forward, double strike, double ttm, double slnVol, double oldDisplacement,
++        double newDisplacement);
++
  
+     //! Calculator class supporting shifted lognormal (Black) and normal (Bachelier) models
+     /*! \bug When the variance is null, division by zero occur during
