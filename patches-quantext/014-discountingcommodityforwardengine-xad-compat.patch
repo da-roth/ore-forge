@@ -1,0 +1,13 @@
+diff --git a/QuantExt/qle/pricingengines/discountingcommodityforwardengine.cpp b/QuantExt/qle/pricingengines/discountingcommodityforwardengine.cpp
+index 71dbfa4..7bd5340 100644
+--- a/QuantExt/qle/pricingengines/discountingcommodityforwardengine.cpp
++++ b/QuantExt/qle/pricingengines/discountingcommodityforwardengine.cpp
+@@ -65,7 +65,7 @@ void DiscountingCommodityForwardEngine::calculate() const {
+         Real fxRate = 1.0;
+         if(arguments_.fxIndex && (arguments_.fixingDate!=Date()) && (arguments_.payCcy!=arguments_.currency)){ // NDF
+             fxRate = arguments_.fxIndex->fixing(arguments_.fixingDate);
+-            value*=fxRate;
++            value = value * fxRate;
+             results_.additionalResults["productCurrency"] = arguments_.currency;
+             results_.additionalResults["settlementCurrency"] = arguments_.payCcy;
+             results_.additionalResults["fxRate"] = fxRate;

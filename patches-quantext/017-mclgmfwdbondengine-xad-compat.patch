@@ -1,0 +1,79 @@
+diff --git a/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp b/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp
+index 7111e6b..576a984 100644
+--- a/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp
++++ b/QuantExt/qle/pricingengines/mclgmfwdbondengine.cpp
+@@ -41,7 +41,7 @@ void McLgmFwdBondEngine::setMember() const {
+     }
+ 
+     // set interim results for both payoff and amc calculator
+-    cmpPayment_ = cmpPaymentDate >= npvDate ? cmpPayment : 0.0;
++    cmpPayment_ = cmpPaymentDate >= npvDate ? Real(cmpPayment) : Real(0.0);
+ 
+     // the case of dirty strike corresponds here to an accrual of 0.0. This will be convenient in the code.
+     accruedAmount_ = arguments_.settlementDirty
+@@ -85,10 +85,10 @@ void McLgmFwdBondEngine::calculate() const {
+ 
+     // take result from base engine, this depends on the pathvaluedirty only (i.e. no regression model -> no
+     // compounding) the raw (untouched) pathvaluedirty is the underlying bond value at disounted to t0
+-    double forwardBondValue = resultUnderlyingNpv_ / incomeCurve_->discount(incomeCurveDate_);
++    Real forwardBondValue = resultUnderlyingNpv_ / incomeCurve_->discount(incomeCurveDate_);
+ 
+     // vanilla forward bond calculation
+-    double forwardContractForwardValue = (arguments_.isLong ? 1.0 : -1.0) *
++    Real forwardContractForwardValue = (arguments_.isLong ? 1.0 : -1.0) *
+                                          (forwardBondValue - accruedAmount_ - arguments_.strikeAmount) *
+                                          arguments_.bondNotional;
+ 
+@@ -96,7 +96,7 @@ void McLgmFwdBondEngine::calculate() const {
+     forwardContractForwardValue /= conversionFactor();
+ 
+     // include compensation payments
+-    double forwardContractPresentValue = forwardContractForwardValue * contractCurve_->discount(contractCurveDate_) -
++    Real forwardContractPresentValue = forwardContractForwardValue * contractCurve_->discount(contractCurveDate_) -
+                                          cmpPayment_ * contractCurve_->discount(cmpPaymentDate_);
+ 
+     results_.value = forwardContractPresentValue;
+@@ -119,7 +119,7 @@ McLgmFwdBondEngine::overwritePathValueUndDirty(double t, const RandomVariable& p
+                                                const std::set<Real>& exerciseXvaTimes,
+                                                const std::vector<std::vector<QuantExt::RandomVariable>>& paths) const {
+ 
+-    double fwdMaturity = time(arguments_.fwdMaturityDate);
++    Real fwdMaturity = time(arguments_.fwdMaturityDate);
+     if (t < fwdMaturity) {
+ 
+         Size ind = std::distance(exerciseXvaTimes.begin(), exerciseXvaTimes.find(t));
+@@ -133,7 +133,7 @@ McLgmFwdBondEngine::overwritePathValueUndDirty(double t, const RandomVariable& p
+             t, paths[ind][model_->pIdx(CrossAssetModel::AssetType::IR, 0)], contractCurve_);
+ 
+         // compounding with income curve from t to fwd_maturity T
+-        double compoundingTime = time(incomeCurveDate_);
++        Real compoundingTime = time(incomeCurveDate_);
+         auto incomeCompounding = lgmVectorised_[0].discountBond(
+             t, compoundingTime, paths[ind][model_->pIdx(CrossAssetModel::AssetType::IR, 0)], incomeCurve_);
+ 
+@@ -166,9 +166,9 @@ std::vector<QuantExt::RandomVariable> McLgmFwdBondEngine::FwdBondAmcCalculator::
+                    << ") required - internal error.");
+ 
+     // convert dates to times
+-    double maturityTime = engine_->time(engine_->arguments_.fwdMaturityDate);
+-    double contractCurveTime = engine_->time(engine_->contractCurveDate_);
+-    double cmpPaymentTime = engine_->time(engine_->cmpPaymentDate_);
++    Real maturityTime = engine_->time(engine_->arguments_.fwdMaturityDate);
++    Real contractCurveTime = engine_->time(engine_->contractCurveDate_);
++    Real cmpPaymentTime = engine_->time(engine_->cmpPaymentDate_);
+ 
+     // bool stickyCloseOutRun = false;
+     std::size_t regModelIndex = 0;
+diff --git a/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp b/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp
+index 0ff4962..e2a85a2 100644
+--- a/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp
++++ b/QuantExt/qle/pricingengines/mclgmfwdbondengine.hpp
+@@ -81,7 +81,7 @@ public:
+ 
+     void calculate() const override;
+     void setMember() const;
+-    double conversionFactor() const { return conversionFactor_->value(); } ;
++    Real conversionFactor() const { return conversionFactor_->value(); } ;
+ 
+     RandomVariable
+     overwritePathValueUndDirty(double t, const RandomVariable& pathValueUndDirty,

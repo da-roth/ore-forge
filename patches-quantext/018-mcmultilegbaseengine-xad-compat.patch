@@ -1,0 +1,13 @@
+diff --git a/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp b/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp
+index f6aa734..5fac2c3 100644
+--- a/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp
++++ b/QuantExt/qle/pricingengines/mcmultilegbaseengine.hpp
+@@ -151,7 +151,7 @@ public:
+     // results, these are read from derived engines
+     mutable Real resultUnderlyingNpv_, resultValue_;
+ 
+-    static constexpr Real tinyTime = 1E-10;
++    static inline const Real tinyTime = 1E-10;
+ 
+     // data structure storing info needed to generate the amount for a cashflow
+     struct CashflowInfo {

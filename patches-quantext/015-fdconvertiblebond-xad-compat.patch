@@ -1,0 +1,53 @@
+diff --git a/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp b/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp
+index 75f2d09..63518c3 100644
+--- a/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp
++++ b/QuantExt/qle/pricingengines/fdconvertiblebondevents.cpp
+@@ -230,7 +230,7 @@ void FdConvertibleBondEvents::processMakeWholeData() {
+         for (Size i = 0; i < grid_.size(); ++i) {
+             if (hasCall_[i]) {
+                 Real t = grid_[i];
+-                callData_[i].mwCr = [interpolation, t, cap](const Real S, const Real cr) {
++                callData_[i].mwCr = [interpolation, t, cap](const Real S, const Real cr) -> Real {
+                     if ((S < interpolation->xMin() && !close_enough(S, interpolation->xMin())) ||
+                         (S > interpolation->xMax() && !close_enough(S, interpolation->xMax())) ||
+                         (t < interpolation->yMin() && !close_enough(t, interpolation->yMin())) ||
+@@ -239,7 +239,7 @@ void FdConvertibleBondEvents::processMakeWholeData() {
+                     } else {
+                         Real tmp = interpolation->operator()(S, t);
+                         // apply cap, but if initial cr was already greater than result, keep that
+-                        return std::max(cr, std::min(cr + tmp, cap));
++                        return Real(std::max(cr, std::min(cr + tmp, cap)));
+                     }
+                 };
+             }
+@@ -399,7 +399,7 @@ void FdConvertibleBondEvents::processConversionAndDivProtData() {
+                             c.adjustmentStyle == ConvertibleBond2::DividendProtectionData::AdjustmentStyle::CrUpOnly
+                                 ? std::max(d - H, 0.0)
+                                 : d - H;
+-                        currentCr *= absolute ? S / std::max(S - C, 1E-4) : (1.0 + C);
++                        currentCr *= absolute ? Real(S / std::max(S - C, 1E-4)) : Real(1.0 + C);
+                     } else {
+                         Real f = std::max(S - H, 0.0) / std::max(S - D, 1E-4);
+                         if (c.adjustmentStyle == ConvertibleBond2::DividendProtectionData::AdjustmentStyle::CrUpOnly2)
+diff --git a/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp b/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
+index cd6dbd6..65a0d75 100644
+--- a/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
++++ b/QuantExt/qle/pricingengines/fddefaultableequityjumpdiffusionconvertiblebondengine.cpp
+@@ -242,7 +242,7 @@ void FdDefaultableEquityJumpDiffusionConvertibleBondEngine::calculate() const {
+         return notionals[std::max<Size>(std::distance(notionalTimes.begin(), cn), 1) - 1];
+     };
+ 
+-    auto recovery = [this, &notional, N0](const Real t, const Real S, const Real conversionRatio) {
++    auto recovery = [this, &notional, N0](const Real t, const Real S, const Real conversionRatio) -> Real {
+         Real currentBondNotional = notional(t);
+         Real rr = this->recoveryRate_.empty() ? 0.0 : this->recoveryRate_->value();
+         Real conversionValue = 0.0;
+@@ -250,7 +250,7 @@ void FdDefaultableEquityJumpDiffusionConvertibleBondEngine::calculate() const {
+             conversionValue = currentBondNotional / N0 * conversionRatio * S * (1.0 - this->model_->eta());
+         if (!this->arguments_.exchangeableData.isExchangeable) {
+             // recovery term for non-exchangeables
+-            return std::max(rr * currentBondNotional, conversionValue);
++            return Real(std::max(rr * currentBondNotional, conversionValue));
+         } else {
+             // equity-related recovery term for exchangeables (same for secured / non-secured)
+             return currentBondNotional;
