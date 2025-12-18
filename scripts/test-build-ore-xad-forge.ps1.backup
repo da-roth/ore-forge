@@ -115,25 +115,12 @@ for patch in /workspace/patches/*.patch; do
 done
 echo "Applied `$patch_count patches to QuantLib"
 
-# Apply minimal build patches first (from Engine root)
-if ls /workspace/patches-quantext/000-minimal-build-*.patch 1>/dev/null 2>&1; then
-  echo ""
-  echo "Applying minimal build patches from Engine root..."
-  cd /tmp/Engine
-  for patch in /workspace/patches-quantext/000-minimal-build-*.patch; do
-    if [ -f "`$patch" ]; then
-      echo "Applying: `$patch"
-      patch -p1 < "`$patch"
-    fi
-  done
-fi
-
-# Apply QuantExt code patches
-if ls /workspace/patches-quantext/0[0-9][1-9]-*.patch 1>/dev/null 2>&1; then
+# Apply QuantExt patches if they exist
+if ls /workspace/patches-quantext/*.patch 1>/dev/null 2>&1; then
   echo ""
   echo "Applying ORE-Forge patches to QuantExt..."
   cd /tmp/Engine/QuantExt
-  for patch in /workspace/patches-quantext/0[0-9][1-9]-*.patch; do
+  for patch in /workspace/patches-quantext/*.patch; do
     if [ -f "`$patch" ]; then
       echo "Applying: `$patch"
       patch -p1 < "`$patch"
@@ -211,27 +198,59 @@ if cmake --build . -- -k 0; then
     ctest -R oredata --output-on-failure || true
     ctest -R oreanalytics --output-on-failure || true
   fi
+
+  echo ""
+  echo "======================================"
+  echo "ORE BUILD COMPLETE!"
+  echo "======================================"
+  exit 0
 else
   echo ""
   echo "======================================"
-  echo "ORE local build test FAILED"
+  echo "BUILD FAILED - See errors above"
   echo "======================================"
   exit 1
 fi
 "@
 
-# Run the build in Docker
+# Get the ore-forge root directory (parent of scripts/)
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$oreForgeRoot = Split-Path -Parent $scriptDir
+
+Write-Host "ORE-Forge root: $oreForgeRoot"
+
+# Debug: Save the script to see what's being generated
+$buildScript | Out-File -FilePath "$scriptDir\debug-build-ore-script.sh" -Encoding ASCII
+
+# Run Docker - Convert CRLF to LF and use UTF8 encoding without BOM
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+$scriptWithLF = $buildScript -replace "`r`n", "`n"
+[System.IO.File]::WriteAllText("$scriptDir\build-ore-script-unix.sh", $scriptWithLF, $utf8NoBom)
+
+# Run the script by mounting ore-forge root to /workspace
 docker run --rm `
-    -v "${PWD}/../patches:/workspace/patches:ro" `
-    -v "${PWD}/../patches-quantext:/workspace/patches-quantext:ro" `
-    -v "${PWD}/..:/workspace:ro" `
-    -e ORE_REPO="$ORE_REPO" `
-    -e ORE_BRANCH="$ORE_BRANCH" `
-    -e XAD_REPO="$XAD_REPO" `
-    -e XAD_BRANCH="$XAD_BRANCH" `
-    -e FORGE_REPO="$FORGE_REPO" `
-    -e FORGE_BRANCH="$FORGE_BRANCH" `
-    -e BUILD_TYPE="$BUILD_TYPE" `
-    -e RUN_TESTS="$RUN_TESTS" `
-    $DOCKER_IMAGE `
-    bash -c $buildScript
+  -v "${oreForgeRoot}:/workspace" `
+  -w /workspace `
+  -e "ORE_REPO=$ORE_REPO" `
+  -e "ORE_BRANCH=$ORE_BRANCH" `
+  -e "XAD_REPO=$XAD_REPO" `
+  -e "XAD_BRANCH=$XAD_BRANCH" `
+  -e "FORGE_REPO=$FORGE_REPO" `
+  -e "FORGE_BRANCH=$FORGE_BRANCH" `
+  -e "BUILD_TYPE=$BUILD_TYPE" `
+  -e "RUN_TESTS=$RUN_TESTS" `
+  $DOCKER_IMAGE bash /workspace/scripts/build-ore-script-unix.sh
+
+if ($LASTEXITCODE -eq 0) {
+  Write-Host ""
+  Write-Host "======================================"
+  Write-Host "ORE local build test PASSED"
+  Write-Host "======================================"
+  exit 0
+} else {
+  Write-Host ""
+  Write-Host "======================================"
+  Write-Host "ORE local build test FAILED"
+  Write-Host "======================================"
+  exit 1
+}

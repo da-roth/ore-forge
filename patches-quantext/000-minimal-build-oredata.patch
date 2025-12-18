@@ -1,0 +1,678 @@
+diff --git a/OREData/OREData/ored/CMakeLists.txt b/OREData/OREData/ored/CMakeLists.txt
+index 67c7b75..f3d8fe0 100644
+--- a/OREData/OREData/ored/CMakeLists.txt
++++ b/OREData/OREData/OREData/ored/CMakeLists.txt
+@@ -1,63 +1,63 @@
+ # cpp files, this list is maintained manually
+ 
+ set(OREData_SRC configuration/basecorrelationcurveconfig.cpp
+-configuration/baseltrafficlightconfig.cpp
+-configuration/bootstrapconfig.cpp
++# configuration/baseltrafficlightconfig.cpp  # EXCLUDED - minimal Example 3
++# configuration/bootstrapconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/capfloorvolcurveconfig.cpp
+-configuration/cdsvolcurveconfig.cpp
+-configuration/commoditycurveconfig.cpp
+-configuration/commodityvolcurveconfig.cpp
++# configuration/cdsvolcurveconfig.cpp  # EXCLUDED - minimal Example 3
++# configuration/commoditycurveconfig.cpp  # EXCLUDED - minimal Example 3
++# configuration/commodityvolcurveconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/conventions.cpp
+-configuration/correlationcurveconfig.cpp
++# configuration/correlationcurveconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/currencyconfig.cpp
+ configuration/curveconfig.cpp
+ configuration/curveconfigurations.cpp
+-configuration/defaultcurveconfig.cpp
+-configuration/equitycurveconfig.cpp
+-configuration/equityvolcurveconfig.cpp
++# configuration/defaultcurveconfig.cpp  # EXCLUDED - minimal Example 3
++# configuration/equitycurveconfig.cpp  # EXCLUDED - minimal Example 3
++# configuration/equityvolcurveconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/fxvolcurveconfig.cpp
+-configuration/genericyieldvolcurveconfig.cpp
++# configuration/genericyieldvolcurveconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/iborfallbackconfig.cpp
+-configuration/inflationcapfloorvolcurveconfig.cpp
+-configuration/inflationcurveconfig.cpp
++# configuration/inflationcapfloorvolcurveconfig.cpp  # EXCLUDED - minimal Example 3
++# configuration/inflationcurveconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/onedimsolverconfig.cpp
+-configuration/parametricsmileconfiguration.cpp
++# configuration/parametricsmileconfiguration.cpp  # EXCLUDED - minimal Example 3
+ configuration/reportconfig.cpp
+-configuration/volatilityconfig.cpp
++# configuration/volatilityconfig.cpp  # EXCLUDED - minimal Example 3
+ configuration/yieldcurveconfig.cpp
+ marketdata/adjustedinmemoryloader.cpp
+-marketdata/adjustmentfactors.cpp
+-marketdata/basecorrelationcurve.cpp
+-marketdata/bondspreadimply.cpp
+-marketdata/bondspreadimplymarket.cpp
++# marketdata/adjustmentfactors.cpp  # EXCLUDED - minimal Example 3
++# marketdata/basecorrelationcurve.cpp  # EXCLUDED - minimal Example 3
++# marketdata/bondspreadimply.cpp  # EXCLUDED - minimal Example 3
++# marketdata/bondspreadimplymarket.cpp  # EXCLUDED - minimal Example 3
+ marketdata/capfloorvolcurve.cpp
+-marketdata/cdsvolcurve.cpp
++# marketdata/cdsvolcurve.cpp  # EXCLUDED - minimal Example 3
+ marketdata/clonedloader.cpp
+-marketdata/commoditycurve.cpp
+-marketdata/commodityvolcurve.cpp
+-marketdata/correlationcurve.cpp
++# marketdata/commoditycurve.cpp  # EXCLUDED - minimal Example 3
++# marketdata/commodityvolcurve.cpp  # EXCLUDED - minimal Example 3
++# marketdata/correlationcurve.cpp  # EXCLUDED - minimal Example 3
+ marketdata/csvloader.cpp
+ marketdata/curvespec.cpp
+ marketdata/curvespecparser.cpp
+-marketdata/defaultcurve.cpp
++# marketdata/defaultcurve.cpp  # EXCLUDED - minimal Example 3
+ marketdata/dependencygraph.cpp
+-marketdata/equitycurve.cpp
+-marketdata/equityvolcurve.cpp
++# marketdata/equitycurve.cpp  # EXCLUDED - minimal Example 3
++# marketdata/equityvolcurve.cpp  # EXCLUDED - minimal Example 3
+ marketdata/expiry.cpp
+-marketdata/fittedbondcurvehelpermarket.cpp
++# marketdata/fittedbondcurvehelpermarket.cpp  # EXCLUDED - minimal Example 3
+ marketdata/fixings.cpp
+ marketdata/fxtriangulation.cpp
+ marketdata/fxvolcurve.cpp
+-marketdata/genericyieldvolcurve.cpp
+-marketdata/inflationcapfloorvolcurve.cpp
+-marketdata/inflationcurve.cpp
++# marketdata/genericyieldvolcurve.cpp  # EXCLUDED - minimal Example 3
++# marketdata/inflationcapfloorvolcurve.cpp  # EXCLUDED - minimal Example 3
++# marketdata/inflationcurve.cpp  # EXCLUDED - minimal Example 3
+ marketdata/inmemoryloader.cpp
+ marketdata/loader.cpp
+ marketdata/market.cpp
+ marketdata/marketdatum.cpp
+ marketdata/marketdatumparser.cpp
+ marketdata/marketimpl.cpp
+-marketdata/security.cpp
++# marketdata/security.cpp  # EXCLUDED - minimal Example 3
+ marketdata/strike.cpp
+ marketdata/swaptionvolcurve.cpp
+ marketdata/todaysmarket.cpp
+@@ -65,9 +65,9 @@ marketdata/todaysmarketcalibrationinfo.cpp
+ marketdata/todaysmarketparameters.cpp
+ marketdata/wrappedmarket.cpp
+ marketdata/yieldcurve.cpp
+-marketdata/yieldvolcurve.cpp
+-model/blackscholesmodelbuilder.cpp
+-model/blackscholesmodelbuilderbase.cpp
++# marketdata/yieldvolcurve.cpp  # EXCLUDED - minimal Example 3
++# model/blackscholesmodelbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/blackscholesmodelbuilderbase.cpp  # EXCLUDED - minimal Example 3
+ model/calibrationbasket.cpp
+ model/calibrationconfiguration.cpp
+ model/calibrationinstrumentfactory.cpp
+@@ -75,297 +75,297 @@ model/calibrationinstruments/cpicapfloor.cpp
+ model/calibrationinstruments/yoycapfloor.cpp
+ model/calibrationinstruments/yoyswap.cpp
+ model/calibrationpointcache.cpp
+-model/commodityschwartzmodelbuilder.cpp
+-model/commodityschwartzmodeldata.cpp
+-model/crcirbuilder.cpp
+-model/crcirdata.cpp
+-model/crlgmbuilder.cpp
+-model/crlgmdata.cpp
++# model/commodityschwartzmodelbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/commodityschwartzmodeldata.cpp  # EXCLUDED - minimal Example 3
++# model/crcirbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/crcirdata.cpp  # EXCLUDED - minimal Example 3
++# model/crlgmbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/crlgmdata.cpp  # EXCLUDED - minimal Example 3
+ model/crossassetmodelbuilder.cpp
+ model/crossassetmodeldata.cpp
+-model/eqbsbuilder.cpp
+-model/eqbsdata.cpp
++# model/eqbsbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/eqbsdata.cpp  # EXCLUDED - minimal Example 3
+ model/fxbsbuilder.cpp
+ model/fxbsdata.cpp
+-model/hwbuilder.cpp
+-model/inflation/infdkbuilder.cpp
+-model/inflation/infdkdata.cpp
+-model/inflation/infjybuilder.cpp
+-model/inflation/infjydata.cpp
+-model/inflation/inflationmodeldata.cpp
+-model/irhwmodeldata.cpp
++# model/hwbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/inflation/infdkbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/inflation/infdkdata.cpp  # EXCLUDED - minimal Example 3
++# model/inflation/infjybuilder.cpp  # EXCLUDED - minimal Example 3
++# model/inflation/infjydata.cpp  # EXCLUDED - minimal Example 3
++# model/inflation/inflationmodeldata.cpp  # EXCLUDED - minimal Example 3
++# model/irhwmodeldata.cpp  # EXCLUDED - minimal Example 3
+ model/irlgmdata.cpp
+ model/irmodelbuilder.cpp
+ model/irmodeldata.cpp
+ model/lgmbuilder.cpp
+-model/lgmdata.cpp
+-model/localvolmodelbuilder.cpp
+-model/modeldata.cpp
+-model/modelparameter.cpp
+-model/utilities.cpp
+-portfolio/accumulator.cpp
+-portfolio/additionalfieldgetter.cpp
+-portfolio/ascot.cpp
+-portfolio/asianoption.cpp
+-portfolio/autocallable_01.cpp
+-portfolio/balanceguaranteedswap.cpp
+-portfolio/barrierdata.cpp
+-portfolio/barrieroption.cpp
+-portfolio/barrieroptionwrapper.cpp
+-portfolio/basketdata.cpp
+-portfolio/basketoption.cpp
+-portfolio/basketvarianceswap.cpp
+-portfolio/bestentryoption.cpp
+-portfolio/bond.cpp
+-portfolio/bondbasket.cpp
+-portfolio/bondfuture.cpp
+-portfolio/bondoption.cpp
+-portfolio/bondposition.cpp
+-portfolio/bondrepo.cpp
+-portfolio/bondtotalreturnswap.cpp
+-portfolio/bondutils.cpp
+-portfolio/builders/ascot.cpp
+-portfolio/builders/asianoption.cpp
+-portfolio/builders/balanceguaranteedswap.cpp
+-portfolio/builders/bond.cpp
+-portfolio/builders/bondoption.cpp
+-portfolio/builders/bondrepo.cpp
+-portfolio/builders/bondtotalreturnswap.cpp
+-portfolio/builders/callablebond.cpp
+-portfolio/builders/capfloor.cpp
+-portfolio/builders/capflooredaveragebmacouponleg.cpp
+-portfolio/builders/capflooredaverageonindexedcouponleg.cpp
+-portfolio/builders/capflooredcpileg.cpp
+-portfolio/builders/capfloorediborleg.cpp
+-portfolio/builders/capfloorednonstandardyoyleg.cpp
+-portfolio/builders/capflooredovernightindexedcouponleg.cpp
+-portfolio/builders/capflooredyoyleg.cpp
+-portfolio/builders/cbo.cpp
+-portfolio/builders/cdo.cpp
+-portfolio/builders/cliquetoption.cpp
+-portfolio/builders/cms.cpp
+-portfolio/builders/cmsspread.cpp
+-portfolio/builders/commodityapo.cpp
+-portfolio/builders/commodityapomodelbuilder.cpp
+-portfolio/builders/commodityasianoption.cpp
+-portfolio/builders/commodityforward.cpp
+-portfolio/builders/commodityoption.cpp
+-portfolio/builders/commodityspreadoption.cpp
+-portfolio/builders/commodityswap.cpp
+-portfolio/builders/commodityswaption.cpp
+-portfolio/builders/convertiblebond.cpp
+-portfolio/builders/cpicapfloor.cpp
+-portfolio/builders/creditdefaultswap.cpp
+-portfolio/builders/creditdefaultswapoption.cpp
+-portfolio/builders/creditlinkedswap.cpp
+-portfolio/builders/currencyswap.cpp
+-portfolio/builders/deltagammaengines.cpp
+-portfolio/builders/durationadjustedcms.cpp
+-portfolio/builders/equityasianoption.cpp
+-portfolio/builders/equitybarrieroption.cpp
+-portfolio/builders/equitycompositeoption.cpp
+-portfolio/builders/equitydigitaloption.cpp
+-portfolio/builders/equitydoublebarrieroption.cpp
+-portfolio/builders/equitydoubletouchoption.cpp
+-portfolio/builders/equityforward.cpp
+-portfolio/builders/equityfuturesoption.cpp
+-portfolio/builders/equityoption.cpp
+-portfolio/builders/equityoutperformanceoption.cpp
+-portfolio/builders/equitytouchoption.cpp
+-portfolio/builders/flexiswap.cpp
+-portfolio/builders/formulabasedcoupon.cpp
+-portfolio/builders/forwardbond.cpp
+-portfolio/builders/fxasianoption.cpp
+-portfolio/builders/fxbarrieroption.cpp
+-portfolio/builders/fxdigitalbarrieroption.cpp
+-portfolio/builders/fxdigitaloption.cpp
+-portfolio/builders/fxdoublebarrieroption.cpp
+-portfolio/builders/fxdoubletouchoption.cpp
+-portfolio/builders/fxforward.cpp
+-portfolio/builders/fxoption.cpp
+-portfolio/builders/fxtouchoption.cpp
+-portfolio/builders/indexcreditdefaultswap.cpp
+-portfolio/builders/indexcreditdefaultswapoption.cpp
+-portfolio/builders/multilegoption.cpp
+-portfolio/builders/pairwisevarianceswap.cpp
+-portfolio/builders/quantoequityoption.cpp
+-portfolio/builders/riskparticipationagreement.cpp
+-portfolio/builders/scriptedtrade.cpp
+-portfolio/builders/swap.cpp
+-portfolio/builders/swaption.cpp
+-portfolio/builders/varianceswap.cpp
+-portfolio/builders/yoycapfloor.cpp
+-portfolio/callablebond.cpp
+-portfolio/callablebondreferencedata.cpp
+-portfolio/callableswap.cpp
+-portfolio/capfloor.cpp
+-portfolio/cashposition.cpp
+-portfolio/cbo.cpp
+-portfolio/cdo.cpp
+-portfolio/cliquetoption.cpp
+-portfolio/collateralbalance.cpp
+-portfolio/commodityapo.cpp
+-portfolio/commoditydigitalapo.cpp
+-portfolio/commoditydigitaloption.cpp
+-portfolio/commodityforward.cpp
+-portfolio/commoditylegbuilder.cpp
+-portfolio/commoditylegdata.cpp
+-portfolio/commodityoption.cpp
+-portfolio/commodityoptionstrip.cpp
+-portfolio/commodityposition.cpp
+-portfolio/commodityspreadoption.cpp
+-portfolio/commodityswap.cpp
+-portfolio/commodityswaption.cpp
+-portfolio/compositeinstrumentwrapper.cpp
+-portfolio/compositetrade.cpp
+-portfolio/convertiblebond.cpp
+-portfolio/convertiblebonddata.cpp
+-portfolio/convertiblebondreferencedata.cpp
+-portfolio/counterpartycorrelationmatrix.cpp
+-portfolio/counterpartyinformation.cpp
+-portfolio/counterpartymanager.cpp
+-portfolio/creditdefaultswap.cpp
+-portfolio/creditdefaultswapdata.cpp
+-portfolio/creditdefaultswapoption.cpp
+-portfolio/creditlinkedswap.cpp
+-portfolio/crosscurrencyswap.cpp
+-portfolio/doubledigitaloption.cpp
+-portfolio/durationadjustedcmslegbuilder.cpp
+-portfolio/durationadjustedcmslegdata.cpp
+-portfolio/enginedata.cpp
+-portfolio/enginefactory.cpp
++# model/lgmdata.cpp  # EXCLUDED - minimal Example 3
++# model/localvolmodelbuilder.cpp  # EXCLUDED - minimal Example 3
++# model/modeldata.cpp  # EXCLUDED - minimal Example 3
++# model/modelparameter.cpp  # EXCLUDED - minimal Example 3
++# model/utilities.cpp  # EXCLUDED - minimal Example 3
++# portfolio/accumulator.cpp  # EXCLUDED - minimal Example 3
++# portfolio/additionalfieldgetter.cpp  # EXCLUDED - minimal Example 3
++# portfolio/ascot.cpp  # EXCLUDED - minimal Example 3
++# portfolio/asianoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/autocallable_01.cpp  # EXCLUDED - minimal Example 3
++# portfolio/balanceguaranteedswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/barrierdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/barrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/barrieroptionwrapper.cpp  # EXCLUDED - minimal Example 3
++# portfolio/basketdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/basketoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/basketvarianceswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bestentryoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondbasket.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondfuture.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondposition.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondrepo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondtotalreturnswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/bondutils.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/ascot.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/asianoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/balanceguaranteedswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/bond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/bondoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/bondrepo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/bondtotalreturnswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/callablebond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capfloor.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capflooredaveragebmacouponleg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capflooredaverageonindexedcouponleg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capflooredcpileg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capfloorediborleg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capfloorednonstandardyoyleg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capflooredovernightindexedcouponleg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/capflooredyoyleg.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/cbo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/cdo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/cliquetoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/cms.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/cmsspread.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityapo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityapomodelbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityasianoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityspreadoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/commodityswaption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/convertiblebond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/cpicapfloor.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/creditdefaultswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/creditdefaultswapoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/creditlinkedswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/currencyswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/deltagammaengines.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/durationadjustedcms.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equityasianoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equitybarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equitycompositeoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equitydigitaloption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equitydoublebarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equitydoubletouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equityforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equityfuturesoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equityoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equityoutperformanceoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/equitytouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/flexiswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/formulabasedcoupon.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/forwardbond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxasianoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxdigitalbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxdigitaloption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxdoublebarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxdoubletouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/fxtouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/indexcreditdefaultswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/indexcreditdefaultswapoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/multilegoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/pairwisevarianceswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/quantoequityoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/riskparticipationagreement.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/scriptedtrade.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/swap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/swaption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/varianceswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/builders/yoycapfloor.cpp  # EXCLUDED - minimal Example 3
++# portfolio/callablebond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/callablebondreferencedata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/callableswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/capfloor.cpp  # EXCLUDED - minimal Example 3
++# portfolio/cashposition.cpp  # EXCLUDED - minimal Example 3
++# portfolio/cbo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/cdo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/cliquetoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/collateralbalance.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityapo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commoditydigitalapo.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commoditydigitaloption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commoditylegbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commoditylegdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityoptionstrip.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityposition.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityspreadoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/commodityswaption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/compositeinstrumentwrapper.cpp  # EXCLUDED - minimal Example 3
++# portfolio/compositetrade.cpp  # EXCLUDED - minimal Example 3
++# portfolio/convertiblebond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/convertiblebonddata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/convertiblebondreferencedata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/counterpartycorrelationmatrix.cpp  # EXCLUDED - minimal Example 3
++# portfolio/counterpartyinformation.cpp  # EXCLUDED - minimal Example 3
++# portfolio/counterpartymanager.cpp  # EXCLUDED - minimal Example 3
++# portfolio/creditdefaultswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/creditdefaultswapdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/creditdefaultswapoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/creditlinkedswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/crosscurrencyswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/doubledigitaloption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/durationadjustedcmslegbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/durationadjustedcmslegdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/enginedata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/enginefactory.cpp  # EXCLUDED - minimal Example 3
+ portfolio/envelope.cpp
+-portfolio/equitybarrieroption.cpp
+-portfolio/equitydigitaloption.cpp
+-portfolio/equitydoublebarrieroption.cpp
+-portfolio/equitydoubletouchoption.cpp
+-portfolio/equityeuropeanbarrieroption.cpp
+-portfolio/equityforward.cpp
+-portfolio/equityfuturesoption.cpp
+-portfolio/equityfxlegbuilder.cpp
+-portfolio/equityfxlegdata.cpp
+-portfolio/equityoption.cpp
+-portfolio/equityoptionposition.cpp
+-portfolio/equityoutperformanceoption.cpp
+-portfolio/equityposition.cpp
+-portfolio/equityswap.cpp
+-portfolio/equitytouchoption.cpp
+-portfolio/europeanoptionbarrier.cpp
+-portfolio/failedtrade.cpp
++# portfolio/equitybarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equitydigitaloption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equitydoublebarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equitydoubletouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityeuropeanbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityfuturesoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityfxlegbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityfxlegdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityoptionposition.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityoutperformanceoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityposition.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equityswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/equitytouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/europeanoptionbarrier.cpp  # EXCLUDED - minimal Example 3
++# portfolio/failedtrade.cpp  # EXCLUDED - minimal Example 3
+ portfolio/fixingdates.cpp
+-portfolio/flexiswap.cpp
+-portfolio/formulabasedindexbuilder.cpp
+-portfolio/formulabasedlegbuilder.cpp
+-portfolio/formulabasedlegdata.cpp
+-portfolio/forwardbond.cpp
+-portfolio/forwardrateagreement.cpp
+-portfolio/fxaverageforward.cpp
+-portfolio/fxbarrieroption.cpp
+-portfolio/fxdigitalbarrieroption.cpp
+-portfolio/fxdigitaloption.cpp
+-portfolio/fxdoublebarrieroption.cpp
+-portfolio/fxdoubletouchoption.cpp
+-portfolio/fxeuropeanbarrieroption.cpp
+-portfolio/fxforward.cpp
+-portfolio/fxkikobarrieroption.cpp
+-portfolio/fxoption.cpp
+-portfolio/fxswap.cpp
+-portfolio/fxtouchoption.cpp
+-portfolio/genericbarrieroption.cpp
+-portfolio/indexcreditdefaultswap.cpp
+-portfolio/indexcreditdefaultswapdata.cpp
+-portfolio/indexcreditdefaultswapoption.cpp
+-portfolio/indexing.cpp
+-portfolio/inflationswap.cpp
+-portfolio/instrumentwrapper.cpp
+-portfolio/knockoutswap.cpp
++# portfolio/flexiswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/formulabasedindexbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/formulabasedlegbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/formulabasedlegdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/forwardbond.cpp  # EXCLUDED - minimal Example 3
++# portfolio/forwardrateagreement.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxaverageforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxdigitalbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxdigitaloption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxdoublebarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxdoubletouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxeuropeanbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxforward.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxkikobarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/fxtouchoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/genericbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/indexcreditdefaultswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/indexcreditdefaultswapdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/indexcreditdefaultswapoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/indexing.cpp  # EXCLUDED - minimal Example 3
++# portfolio/inflationswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/instrumentwrapper.cpp  # EXCLUDED - minimal Example 3
++# portfolio/knockoutswap.cpp  # EXCLUDED - minimal Example 3
+ portfolio/legbuilders.cpp
+ portfolio/legdata.cpp
+-portfolio/legdatafactory.cpp
+-portfolio/makenonstandardlegs.cpp
+-portfolio/multilegoption.cpp
++# portfolio/legdatafactory.cpp  # EXCLUDED - minimal Example 3
++# portfolio/makenonstandardlegs.cpp  # EXCLUDED - minimal Example 3
++# portfolio/multilegoption.cpp  # EXCLUDED - minimal Example 3
+ portfolio/nettingsetdefinition.cpp
+-portfolio/nettingsetdetails.cpp
+-portfolio/nettingsetmanager.cpp
+-portfolio/optiondata.cpp
+-portfolio/optionexercisedata.cpp
+-portfolio/optionpaymentdata.cpp
+-portfolio/optionwrapper.cpp
+-portfolio/pairwisevarianceswap.cpp
+-portfolio/performanceoption_01.cpp
++# portfolio/nettingsetdetails.cpp  # EXCLUDED - minimal Example 3
++# portfolio/nettingsetmanager.cpp  # EXCLUDED - minimal Example 3
++# portfolio/optiondata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/optionexercisedata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/optionpaymentdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/optionwrapper.cpp  # EXCLUDED - minimal Example 3
++# portfolio/pairwisevarianceswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/performanceoption_01.cpp  # EXCLUDED - minimal Example 3
+ portfolio/portfolio.cpp
+-portfolio/premiumdata.cpp
+-portfolio/rainbowoption.cpp
+-portfolio/rangebound.cpp
++# portfolio/premiumdata.cpp  # EXCLUDED - minimal Example 3
++# portfolio/rainbowoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/rangebound.cpp  # EXCLUDED - minimal Example 3
+ portfolio/referencedata.cpp
+ portfolio/referencedatafactory.cpp
+-portfolio/riskparticipationagreement.cpp
++# portfolio/riskparticipationagreement.cpp  # EXCLUDED - minimal Example 3
+ portfolio/schedule.cpp
+-portfolio/scriptedtrade.cpp
+-portfolio/strikeresettableoption.cpp
++# portfolio/scriptedtrade.cpp  # EXCLUDED - minimal Example 3
++# portfolio/strikeresettableoption.cpp  # EXCLUDED - minimal Example 3
+ portfolio/swap.cpp
+ portfolio/swaption.cpp
+-portfolio/tarf.cpp
+-portfolio/tlockdata.cpp
++# portfolio/tarf.cpp  # EXCLUDED - minimal Example 3
++# portfolio/tlockdata.cpp  # EXCLUDED - minimal Example 3
+ portfolio/trade.cpp
+-portfolio/tradeactions.cpp
+-portfolio/tradebarrier.cpp
++# portfolio/tradeactions.cpp  # EXCLUDED - minimal Example 3
++# portfolio/tradebarrier.cpp  # EXCLUDED - minimal Example 3
+ portfolio/tradefactory.cpp
+-portfolio/tradegenerator.cpp
+-portfolio/trademonetary.cpp
+-portfolio/tradestrike.cpp
+-portfolio/tranche.cpp
+-portfolio/trs.cpp
+-portfolio/trsunderlyingbuilder.cpp
+-portfolio/trswrapper.cpp
+-portfolio/underlying.cpp
+-portfolio/vanillaoption.cpp
+-portfolio/varianceswap.cpp
+-portfolio/windowbarrieroption.cpp
+-portfolio/worstofbasketswap.cpp
+-report/csvreport.cpp
+-report/inmemoryreport.cpp
+-report/utilities.cpp
+-scripting/ast.cpp
+-scripting/astprinter.cpp
+-scripting/astresetter.cpp
+-scripting/asttoscriptconverter.cpp
+-scripting/computationgraphbuilder.cpp
+-scripting/context.cpp
+-scripting/engines/amccgbaseengine.cpp
+-scripting/engines/amccgcurrencyswapengine.cpp
+-scripting/engines/amccgfxforwardengine.cpp
+-scripting/engines/amccgfxoptionengine.cpp
+-scripting/engines/amccgmultilegoptionengine.cpp
+-scripting/engines/amccgpricingengine.cpp
+-scripting/engines/amccgswapengine.cpp
+-scripting/engines/analyticblackriskparticipationagreementengine.cpp
+-scripting/engines/analyticxccyblackriskparticipationagreementengine.cpp
+-scripting/engines/cliquetoptionmcscriptengine.cpp
+-scripting/engines/numericlgmriskparticipationagreementengine.cpp
+-scripting/engines/numericlgmriskparticipationagreementengine_tlock.cpp
+-scripting/engines/riskparticipationagreementbaseengine.cpp
+-scripting/engines/scriptedinstrumentamccalculator.cpp
+-scripting/engines/scriptedinstrumentpricingengine.cpp
+-scripting/engines/scriptedinstrumentpricingenginecg.cpp
+-scripting/grammar.cpp
+-scripting/models/blackscholes.cpp
+-scripting/models/blackscholescg.cpp
+-scripting/models/fdgaussiancam.cpp
+-scripting/models/gaussiancam.cpp
+-scripting/models/gaussiancamcg.cpp
+-scripting/models/lgmcg.cpp
+-scripting/models/modelcg.cpp
+-scripting/models/modelcgimpl.cpp
+-scripting/models/modelimpl.cpp
+-scripting/paylog.cpp
+-scripting/randomastgenerator.cpp
+-scripting/scriptedinstrument.cpp
++# portfolio/tradegenerator.cpp  # EXCLUDED - minimal Example 3
++# portfolio/trademonetary.cpp  # EXCLUDED - minimal Example 3
++# portfolio/tradestrike.cpp  # EXCLUDED - minimal Example 3
++# portfolio/tranche.cpp  # EXCLUDED - minimal Example 3
++# portfolio/trs.cpp  # EXCLUDED - minimal Example 3
++# portfolio/trsunderlyingbuilder.cpp  # EXCLUDED - minimal Example 3
++# portfolio/trswrapper.cpp  # EXCLUDED - minimal Example 3
++# portfolio/underlying.cpp  # EXCLUDED - minimal Example 3
++# portfolio/vanillaoption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/varianceswap.cpp  # EXCLUDED - minimal Example 3
++# portfolio/windowbarrieroption.cpp  # EXCLUDED - minimal Example 3
++# portfolio/worstofbasketswap.cpp  # EXCLUDED - minimal Example 3
++# report/csvreport.cpp  # EXCLUDED - minimal Example 3
++# report/inmemoryreport.cpp  # EXCLUDED - minimal Example 3
++# report/utilities.cpp  # EXCLUDED - minimal Example 3
++# scripting/ast.cpp  # EXCLUDED - minimal Example 3
++# scripting/astprinter.cpp  # EXCLUDED - minimal Example 3
++# scripting/astresetter.cpp  # EXCLUDED - minimal Example 3
++# scripting/asttoscriptconverter.cpp  # EXCLUDED - minimal Example 3
++# scripting/computationgraphbuilder.cpp  # EXCLUDED - minimal Example 3
++# scripting/context.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgbaseengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgcurrencyswapengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgfxforwardengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgfxoptionengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgmultilegoptionengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgpricingengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/amccgswapengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/analyticblackriskparticipationagreementengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/analyticxccyblackriskparticipationagreementengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/cliquetoptionmcscriptengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/numericlgmriskparticipationagreementengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/numericlgmriskparticipationagreementengine_tlock.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/riskparticipationagreementbaseengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/scriptedinstrumentamccalculator.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/scriptedinstrumentpricingengine.cpp  # EXCLUDED - minimal Example 3
++# scripting/engines/scriptedinstrumentpricingenginecg.cpp  # EXCLUDED - minimal Example 3
++# scripting/grammar.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/blackscholes.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/blackscholescg.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/fdgaussiancam.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/gaussiancam.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/gaussiancamcg.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/lgmcg.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/modelcg.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/modelcgimpl.cpp  # EXCLUDED - minimal Example 3
++# scripting/models/modelimpl.cpp  # EXCLUDED - minimal Example 3
++# scripting/paylog.cpp  # EXCLUDED - minimal Example 3
++# scripting/randomastgenerator.cpp  # EXCLUDED - minimal Example 3
++# scripting/scriptedinstrument.cpp  # EXCLUDED - minimal Example 3
+ scripting/scriptengine.cpp
+-scripting/scriptparser.cpp
+-scripting/staticanalyser.cpp
+-scripting/utilities.cpp
+-scripting/value.cpp
++# scripting/scriptparser.cpp  # EXCLUDED - minimal Example 3
++# scripting/staticanalyser.cpp  # EXCLUDED - minimal Example 3
++# scripting/utilities.cpp  # EXCLUDED - minimal Example 3
++# scripting/value.cpp  # EXCLUDED - minimal Example 3
+ utilities/bondindexbuilder.cpp
+ utilities/calendaradjustmentconfig.cpp
+ utilities/calendarparser.cpp
