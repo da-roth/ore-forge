@@ -1,0 +1,210 @@
+##############################################################################
+#
+#  ORE-Forge CI Workflow - Full ORE Build
+#
+#  Builds the complete ORE stack (QuantLib + QuantExt + OREData + OREAnalytics)
+#  with XAD-JIT and Forge enabled.
+#
+#  This workflow:
+#  1. Gets full ORE Engine with QuantLib submodule
+#  2. Applies patches for XAD compatibility
+#  3. Builds Forge as a pre-built package
+#  4. Builds full ORE with XAD-JIT + Forge integration
+#  5. Runs ORE test suites
+#
+#  Copyright (C) 2025 The ORE-Forge Authors
+#
+#  SPDX-License-Identifier: AGPL-3.0-or-later
+#
+##############################################################################
+
+name: CI ORE
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ci-ore.yaml'
+      - 'patches/**'
+      - 'src/**'
+      - 'ql/**'
+  pull_request:
+    paths:
+      - '.github/workflows/ci-ore.yaml'
+      - 'patches/**'
+      - 'src/**'
+      - 'ql/**'
+  workflow_dispatch:
+    inputs:
+      ore_repo:
+        description: ORE Engine repository in <owner>/<repo> format
+        required: true
+        default: OpenSourceRisk/Engine
+      ore_branch:
+        description: Branch or tag for ORE Engine repository
+        required: true
+        default: v1.8.14.0
+      xad_repo:
+        description: XAD-JIT repository in <owner>/<repo> format
+        required: true
+        default: da-roth/xad-jit
+      xad_branch:
+        description: Branch or tag for XAD-JIT repository
+        required: true
+        default: main
+      forge_repo:
+        description: Forge repository in <owner>/<repo> format
+        required: true
+        default: da-roth/forge
+      forge_branch:
+        description: Branch or tag for Forge repository
+        required: true
+        default: main
+
+env:
+  ore_repo: ${{ github.event.inputs.ore_repo || 'OpenSourceRisk/Engine' }}
+  ore_branch: ${{ github.event.inputs.ore_branch || 'v1.8.14.0' }}
+  xad_repo: ${{ github.event.inputs.xad_repo || 'da-roth/xad-jit' }}
+  xad_branch: ${{ github.event.inputs.xad_branch || 'main' }}
+  forge_repo: ${{ github.event.inputs.forge_repo || 'da-roth/forge' }}
+  forge_branch: ${{ github.event.inputs.forge_branch || 'main' }}
+
+jobs:
+  linux-ore-forge:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: ["Release"]
+        # Start with C++ API only for ORE build
+        # Can add C API later once C++ API is working
+    runs-on: ubuntu-latest
+    container: ghcr.io/lballabio/quantlib-devenv:rolling
+
+    name: Linux ORE ${{ matrix.build_type }}
+
+    steps:
+      # Checkout full ORE Engine with QuantLib submodule
+      - name: Checkout ORE Engine
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ore_repo }}
+          ref: ${{ env.ore_branch }}
+          path: Engine
+          submodules: recursive
+
+      - name: Checkout XAD-JIT
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.xad_repo }}
+          ref: ${{ env.xad_branch }}
+          path: xad-jit
+
+      - name: Checkout Forge
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.forge_repo }}
+          ref: ${{ env.forge_branch }}
+          path: forge
+
+      # Checkout ORE-Forge (this repo - contains patches, qlrisks.hpp, ForgeBackend)
+      - name: Checkout ORE-Forge
+        uses: actions/checkout@v4
+        with:
+          path: ORE-Forge
+
+      # Apply patches for XAD compatibility to ORE's QuantLib
+      - name: Apply patches to QuantLib
+        run: |
+          cd Engine/QuantLib
+          echo "Applying ORE-Forge patches to ORE's QuantLib..."
+          for patch in ../../ORE-Forge/patches/*.patch; do
+            if [ -f "$patch" ]; then
+              echo "Applying: $patch"
+              patch -p1 < "$patch"
+            fi
+          done
+          echo "Patches applied successfully."
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: linux-ore-forge-${{ matrix.build_type }}
+          max-size: 1G
+
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y ninja-build ccache
+
+      # Build Forge as pre-built package (isolates AVX2 flags from ORE build)
+      - name: Build Forge
+        run: |
+          cd forge
+          cmake -B build -S tools/packaging \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_INSTALL_PREFIX=$(pwd)/../install
+          cmake --build build --config ${{ matrix.build_type }}
+          cmake --install build --config ${{ matrix.build_type }}
+
+      # Configure full ORE with XAD-JIT + Forge
+      # ORE's CMakeLists.txt builds: QuantLib -> QuantExt -> OREData -> OREAnalytics -> App
+      - name: Configure ORE with XAD-JIT + Forge
+        run: |
+          cd Engine
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DBOOST_ROOT=/usr \
+            -DCMAKE_PREFIX_PATH=$(pwd)/../install \
+            -DQL_EXTERNAL_SUBDIRECTORIES="$(pwd)/../xad-jit;$(pwd)/../ORE-Forge" \
+            -DQL_EXTRA_LINK_LIBRARIES=QuantLib-Risks \
+            -DQL_NULL_AS_FUNCTIONS=ON \
+            -DXAD_WARNINGS_PARANOID=OFF \
+            -DQLRISKS_DISABLE_AAD=OFF \
+            -DQLRISKS_BUILD_TEST_SUITE=OFF \
+            -DQLRISKS_ENABLE_FORGE_TESTS=OFF \
+            -DORE_BUILD_DOC=OFF \
+            -DORE_BUILD_EXAMPLES=OFF \
+            -DORE_BUILD_TESTS=ON \
+            -DORE_BUILD_SWIG=OFF
+
+      # Build with keep-going to see all errors
+      - name: Build ORE
+        run: |
+          cd Engine/build
+          cmake --build . -- -k 0
+
+      # Run QuantExt tests
+      - name: Test QuantExt
+        run: |
+          cd Engine/build
+          ctest -R quantext --output-on-failure || true
+
+      # Run OREData tests
+      - name: Test OREData
+        run: |
+          cd Engine/build
+          ctest -R oredata --output-on-failure || true
+
+      # Run OREAnalytics tests
+      - name: Test OREAnalytics
+        run: |
+          cd Engine/build
+          ctest -R oreanalytics --output-on-failure || true
+
+      # Show build summary
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "=== Build Summary ==="
+          echo "ORE Engine: ${{ env.ore_branch }}"
+          echo "XAD-JIT: ${{ env.xad_branch }}"
+          echo "Forge: ${{ env.forge_branch }}"
+          echo ""
+          if [ -d "Engine/build" ]; then
+            echo "=== Built Targets ==="
+            find Engine/build -name "*.so" -o -name "*.a" 2>/dev/null | head -20 || true
+            echo ""
+            echo "=== Test Results ==="
+            cat Engine/build/Testing/Temporary/LastTest.log 2>/dev/null | tail -50 || echo "No test log found"
+          fi
