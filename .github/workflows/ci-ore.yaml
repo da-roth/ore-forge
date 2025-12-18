@@ -165,7 +165,8 @@ jobs:
             -DQLRISKS_ENABLE_FORGE_TESTS=OFF \
             -DORE_BUILD_DOC=OFF \
             -DORE_BUILD_EXAMPLES=OFF \
-            -DORE_BUILD_TESTS=ON
+            -DORE_BUILD_TESTS=ON \
+            -DORE_BUILD_SWIG=OFF
 
       # Build with keep-going to see all errors
       - name: Build ORE
