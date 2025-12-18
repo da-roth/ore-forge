@@ -21,11 +21,10 @@
 #
 ##############################################################################
 
-name: CI
+name: CI QuantLib
 
 on:
-  push:
-  pull_request:
+  # Manual trigger only - use "Run workflow" button in GitHub Actions
   workflow_dispatch:
     inputs:
       ore_repo:
