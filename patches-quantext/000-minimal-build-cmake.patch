@@ -1,7 +1,5 @@
-diff --git a/QuantExt/qle/CMakeLists.txt b/qle/CMakeLists.txt
-index f747a1e..91ed203 100644
---- a/QuantExt/qle/CMakeLists.txt
-+++ b/QuantExt/qle/CMakeLists.txt
+--- a/QuantExt/qle/CMakeLists.txt	2025-12-18 20:36:56.430945300 +0100
++++ b/QuantExt/qle/CMakeLists.txt	2025-12-18 20:48:04.512014800 +0100
 @@ -1,8 +1,8 @@
  # cpp files, this list is maintained manually
  
@@ -13,7 +11,7 @@ index f747a1e..91ed203 100644
  calendars/amendedcalendar.cpp
  calendars/austria.cpp
  calendars/belgium.cpp
-@@ -26,413 +26,413 @@ calendars/spain.cpp
+@@ -26,413 +26,413 @@
  calendars/switzerland.cpp
  calendars/unitedarabemirates.cpp
  calendars/wmr.cpp

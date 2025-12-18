@@ -1,7 +1,5 @@
-diff --git a/OREAnalytics/OREAnalytics/orea/CMakeLists.txt b/OREAnalytics/OREAnalytics/orea/CMakeLists.txt
-index 2ed5bc9..1e16b42 100644
---- a/OREAnalytics/OREAnalytics/orea/CMakeLists.txt
-+++ b/OREAnalytics/OREAnalytics/OREAnalytics/orea/CMakeLists.txt
+--- a/OREAnalytics/orea/CMakeLists.txt	2025-12-18 20:50:43.690339400 +0100
++++ b/OREAnalytics/orea/CMakeLists.txt	2025-12-18 20:50:43.803376800 +0100
 @@ -1,67 +1,67 @@
  # cpp files, this list is maintained manually
  
@@ -122,7 +120,7 @@ index 2ed5bc9..1e16b42 100644
  cube/cube_io.cpp
  cube/cubecsvreader.cpp
  cube/cubeinterpretation.cpp
-@@ -73,61 +73,61 @@ cube/jointnpvsensicube.cpp
+@@ -73,61 +73,61 @@
  cube/sensicube.cpp
  cube/sensitivitycube.cpp
  cube/sparsenpvcube.cpp
@@ -237,7 +235,7 @@ index 2ed5bc9..1e16b42 100644
  scenario/clonedscenariogenerator.cpp
  scenario/clonescenariofactory.cpp
  scenario/crossassetmodelscenariogenerator.cpp
-@@ -158,55 +158,55 @@ scenario/simplescenario.cpp
+@@ -158,55 +158,55 @@
  scenario/stressscenariodata.cpp
  scenario/stressscenariogenerator.cpp
  scenario/zerotoparscenariogenerator.cpp

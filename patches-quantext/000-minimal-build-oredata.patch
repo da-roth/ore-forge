@@ -1,7 +1,5 @@
-diff --git a/OREData/OREData/ored/CMakeLists.txt b/OREData/OREData/ored/CMakeLists.txt
-index 67c7b75..f3d8fe0 100644
---- a/OREData/OREData/ored/CMakeLists.txt
-+++ b/OREData/OREData/OREData/ored/CMakeLists.txt
+--- a/OREData/ored/CMakeLists.txt	2025-12-18 20:50:09.107202600 +0100
++++ b/OREData/ored/CMakeLists.txt	2025-12-18 20:50:09.255608800 +0100
 @@ -1,63 +1,63 @@
  # cpp files, this list is maintained manually
  
@@ -96,7 +94,7 @@ index 67c7b75..f3d8fe0 100644
  marketdata/strike.cpp
  marketdata/swaptionvolcurve.cpp
  marketdata/todaysmarket.cpp
-@@ -65,9 +65,9 @@ marketdata/todaysmarketcalibrationinfo.cpp
+@@ -65,9 +65,9 @@
  marketdata/todaysmarketparameters.cpp
  marketdata/wrappedmarket.cpp
  marketdata/yieldcurve.cpp
@@ -109,7 +107,7 @@ index 67c7b75..f3d8fe0 100644
  model/calibrationbasket.cpp
  model/calibrationconfiguration.cpp
  model/calibrationinstrumentfactory.cpp
-@@ -75,297 +75,297 @@ model/calibrationinstruments/cpicapfloor.cpp
+@@ -75,297 +75,297 @@
  model/calibrationinstruments/yoycapfloor.cpp
  model/calibrationinstruments/yoyswap.cpp
  model/calibrationpointcache.cpp
